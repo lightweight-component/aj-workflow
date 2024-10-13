@@ -45,7 +45,7 @@ public class OrderService implements WfConstant {
      * @return 活动流程实例对象
      */
     public Order create(ProcessPO process, Long operator, Map<String, Object> args, Long parentId, String parentNodeName) {
-        log.info("创建流程实例 " + process.getName());
+        log.info("创建流程实例 {}", process.getName());
 
         Order order = new Order();
         order.setParentId(parentId);
@@ -86,7 +86,7 @@ public class OrderService implements WfConstant {
     private Long create(Order order) {
         Long id = CRUD.create(order);
         order.setId(id);
-        log.info("保存历史流程实例 " + order.getName());
+        log.info("保存历史流程实例 {}", order.getName());
         OrderHistory history = new OrderHistory(order);// 复制一份
         history.setStat(WfConstant.STATE_ACTIVE);
         CRUD.create(history);
