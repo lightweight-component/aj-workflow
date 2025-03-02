@@ -1,7 +1,6 @@
 package com.ajaxjs.workflow.model.node.work;
 
 import com.ajaxjs.data.CRUD;
-import com.ajaxjs.util.map.JsonHelper;
 import com.ajaxjs.util.reflect.Methods;
 import com.ajaxjs.util.reflect.NewInstance;
 import com.ajaxjs.workflow.common.WfConstant;
@@ -85,7 +84,7 @@ public class CustomModel extends WorkModel {
         task.setStat(WfConstant.STATE_FINISH);
         task.setTaskType(TaskType.RECORD);
         task.setParentId(exec.getTask() == null ? 0 : exec.getTask().getId());
-        task.setVariable(JsonHelper.toJson(exec.getArgs()));
+//        task.setVariable(JsonHelper.toJson(exec.getArgs()));
         CRUD.create(task);
 
         runOutTransition(exec);
