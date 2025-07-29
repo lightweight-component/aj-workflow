@@ -1,17 +1,16 @@
 package com.ajaxjs.workflow.service.parser;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.ajaxjs.util.DateUtil;
+import com.ajaxjs.workflow.model.FieldModel;
+import com.ajaxjs.workflow.model.node.NodeModel;
+import com.ajaxjs.workflow.model.node.work.TaskModel;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.ajaxjs.util.DateUtil;
-import com.ajaxjs.workflow.model.FieldModel;
-import com.ajaxjs.workflow.model.node.NodeModel;
-import com.ajaxjs.workflow.model.node.work.TaskModel;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 任务节点解析类

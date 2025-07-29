@@ -1,12 +1,11 @@
-
 package com.ajaxjs.workflow.service.scheduling;
+
+import com.ajaxjs.workflow.model.po.Task;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
-
-import com.ajaxjs.workflow.model.po.Task;
-import lombok.Data;
 
 /**
  * Job 实体，用于传递给具体的调度框架

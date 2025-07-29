@@ -1,12 +1,11 @@
 package com.ajaxjs.workflow.service.parser;
 
+import com.ajaxjs.workflow.model.node.NodeModel;
+import com.ajaxjs.workflow.model.node.work.SubProcessModel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
-
-import com.ajaxjs.workflow.model.node.NodeModel;
-import com.ajaxjs.workflow.model.node.work.SubProcessModel;
 
 /**
  * 子流程节点解析类

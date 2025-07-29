@@ -10,30 +10,30 @@ import org.junit.Test;
 import java.util.List;
 
 public class TestCustom extends BaseTest {
-	@Test
-	public void testCustomHandler() {
+    @Test
+    public void testCustomHandler() {
 //		WorkflowEngine engine = (WorkflowEngine) init("test/custom/c1.xml");
-		Order order = engine.startInstanceByName("custom1", 0, null, null);
-		List<Task> tasks = WfData.findTasksByOrderId(order.getId());
+        Order order = engine.startInstanceByName("custom1", 0, null, null);
+        List<Task> tasks = WfData.findTasksByOrderId(order.getId());
 
-		if (tasks != null)
-			for (Task task : tasks) {
-				engine.executeTask(task.getId(), null, null);
-			}
-	}
+        if (tasks != null)
+            for (Task task : tasks) {
+                engine.executeTask(task.getId(), null, null);
+            }
+    }
 
-	@Test
-	public void testCustomClass() {
+    @Test
+    public void testCustomClass() {
 //		WorkflowEngine engine = (WorkflowEngine) init("test/custom/c2.xml");
-		Args args = new Args();
-		args.put("msg", "custom test");
+        Args args = new Args();
+        args.put("msg", "custom test");
 
-		Order order = engine.startInstanceById(engine.processService.lastDeployProcessId, null, args);
-		List<Task> tasks = WfData.findTasksByOrderId(order.getId());
-		
-		if (tasks != null)
-			for (Task task : tasks) {
-				engine.executeTask(task.getId(), null, args);
-			}
-	}
+        Order order = engine.startInstanceById(engine.processService.lastDeployProcessId, null, args);
+        List<Task> tasks = WfData.findTasksByOrderId(order.getId());
+
+        if (tasks != null)
+            for (Task task : tasks) {
+                engine.executeTask(task.getId(), null, args);
+            }
+    }
 }

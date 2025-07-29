@@ -1,10 +1,6 @@
 package com.ajaxjs.workflow.service.handler;
 
-import java.util.List;
-
 import com.ajaxjs.workflow.common.WfData;
-import org.springframework.util.CollectionUtils;
-
 import com.ajaxjs.workflow.model.Execution;
 import com.ajaxjs.workflow.model.ProcessModel;
 import com.ajaxjs.workflow.model.node.work.SubProcessModel;
@@ -12,6 +8,9 @@ import com.ajaxjs.workflow.model.node.work.TaskModel;
 import com.ajaxjs.workflow.model.po.Order;
 import com.ajaxjs.workflow.model.po.Task;
 import com.ajaxjs.workflow.service.TaskService;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
 
 /**
  * 合并处理的抽象处理器 需要子类提供查询无法合并的 task 集合的参数 map

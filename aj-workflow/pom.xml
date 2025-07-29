@@ -3,8 +3,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>com.ajaxjs</groupId>
-        <artifactId>aj-common-parent</artifactId>
-        <version>1.8</version>
+        <artifactId>ajaxjs-parent</artifactId>
+        <version>1.32</version>
         <relativePath/>
     </parent>
 

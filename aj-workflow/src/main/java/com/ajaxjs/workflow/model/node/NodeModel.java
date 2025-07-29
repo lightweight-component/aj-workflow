@@ -112,9 +112,9 @@ public abstract class NodeModel extends BaseWfModel {
      * 如果目标节点不是该类的实例，则递归地检查目标节点的所有输出转换模型。
      *
      * @param models 模型列表，用于收集符合条件的模型。
-     * @param tm 当前检查的转换模型。
-     * @param clazz 需要匹配的目标类。
-     * @param <T> 模型的类型参数。
+     * @param tm     当前检查的转换模型。
+     * @param clazz  需要匹配的目标类。
+     * @param <T>    模型的类型参数。
      */
     @SuppressWarnings("unchecked")
     protected <T> void addNextModels(List<T> models, TransitionModel tm, Class<T> clazz) {

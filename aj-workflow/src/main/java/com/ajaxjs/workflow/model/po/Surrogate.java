@@ -13,40 +13,40 @@ import java.util.Date;
 @Data
 @TableName("wf_surrogate")
 public class Surrogate implements Serializable {
-	private static final long serialVersionUID = -7359321877096338448L;
+    private static final long serialVersionUID = -7359321877096338448L;
 
-	private Long id;
+    private Long id;
 
-	private Integer stat;
+    private Integer stat;
 
-	/**
-	 * 流程 name
-	 */
-	private Date processName;
+    /**
+     * 流程 name
+     */
+    private Date processName;
 
-	/**
-	 * 授权人
-	 */
-	private Long operator;
+    /**
+     * 授权人
+     */
+    private Long operator;
 
-	/**
-	 * 代理人
-	 */
-	private Long surrogate;
+    /**
+     * 代理人
+     */
+    private Long surrogate;
 
-	/**
-	 * 操作时间
-	 */
-	private Date operatorDate;
+    /**
+     * 操作时间
+     */
+    private Date operatorDate;
 
-	/**
-	 * 开始时间
-	 */
-	private Date startDate;
+    /**
+     * 开始时间
+     */
+    private Date startDate;
 
-	/**
-	 * 结束时间
-	 */
-	private Date endDate;
+    /**
+     * 结束时间
+     */
+    private Date endDate;
 
 }

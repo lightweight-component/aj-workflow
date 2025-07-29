@@ -14,18 +14,17 @@
  */
 package com.ajaxjs.workflow.service.parser;
 
-import org.springframework.stereotype.Component;
-
 import com.ajaxjs.workflow.model.node.NodeModel;
 import com.ajaxjs.workflow.model.node.StartModel;
+import org.springframework.stereotype.Component;
 
 /**
  * 开始节点解析类
  */
 @Component
 public class StartParser extends AbstractNodeParser {
-	@Override
-	protected NodeModel newModel() {
-		return new StartModel();
-	}
+    @Override
+    protected NodeModel newModel() {
+        return new StartModel();
+    }
 }

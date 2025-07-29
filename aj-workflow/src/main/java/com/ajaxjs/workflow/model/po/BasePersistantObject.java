@@ -1,18 +1,15 @@
 package com.ajaxjs.workflow.model.po;
 
-import java.util.Date;
-
-import com.ajaxjs.framework.IBaseModel;
 import lombok.Data;
+
+import java.util.Date;
 
 /**
  * 持久对象
  * PO 就是数据库中的记录，一个 PO 的数据结构对应着库中表的结构，表中的一条记录就是一个 PO 对象
- *
- * @author Frank Cheung sp42@qq.com
  */
 @Data
-public abstract class BasePersistantObject implements IBaseModel {
+public abstract class BasePersistantObject  {
     private Long id;
 
     /**

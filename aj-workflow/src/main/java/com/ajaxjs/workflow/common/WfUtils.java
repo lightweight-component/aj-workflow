@@ -1,6 +1,5 @@
 package com.ajaxjs.workflow.common;
 
-import com.ajaxjs.util.DateUtil;
 import com.ajaxjs.workflow.model.ProcessModel;
 
 import java.lang.reflect.Array;
@@ -10,8 +9,6 @@ import java.util.regex.Pattern;
 
 /**
  * 工作流工具类
- *
- * @author sp42@qq.com
  */
 public class WfUtils {
     /**

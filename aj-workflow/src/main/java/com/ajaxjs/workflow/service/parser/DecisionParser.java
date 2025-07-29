@@ -1,10 +1,9 @@
 package com.ajaxjs.workflow.service.parser;
 
-import org.springframework.stereotype.Component;
-import org.w3c.dom.Element;
-
 import com.ajaxjs.workflow.model.node.DecisionModel;
 import com.ajaxjs.workflow.model.node.NodeModel;
+import org.springframework.stereotype.Component;
+import org.w3c.dom.Element;
 
 /**
  * 决策节点解析类

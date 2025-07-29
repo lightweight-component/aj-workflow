@@ -1,11 +1,11 @@
 package com.ajaxjs.workflow.model.node;
 
-import java.util.List;
-
 import com.ajaxjs.workflow.model.Execution;
 import com.ajaxjs.workflow.model.TransitionModel;
 import com.ajaxjs.workflow.model.node.work.WorkModel;
 import com.ajaxjs.workflow.service.handler.AbstractMergeHandler;
+
+import java.util.List;
 
 /**
  * 合并定义 join 元素

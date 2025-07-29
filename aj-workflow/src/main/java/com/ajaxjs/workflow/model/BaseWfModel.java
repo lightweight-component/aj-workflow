@@ -1,9 +1,9 @@
 package com.ajaxjs.workflow.model;
 
-import java.io.Serializable;
-
 import com.ajaxjs.workflow.service.handler.IHandler;
 import lombok.Data;
+
+import java.io.Serializable;
 
 /**
  * 模型元素基类

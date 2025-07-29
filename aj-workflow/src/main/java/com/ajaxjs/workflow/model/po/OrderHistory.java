@@ -1,11 +1,11 @@
 package com.ajaxjs.workflow.model.po;
 
-import java.util.Date;
-
 import com.ajaxjs.data.jdbc_helper.common.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.beans.BeanUtils;
+
+import java.util.Date;
 
 /**
  * 历史流程实例实体类

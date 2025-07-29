@@ -1,4 +1,3 @@
-
 package com.ajaxjs.workflow.service.interceptor;
 
 import com.ajaxjs.workflow.model.Execution;

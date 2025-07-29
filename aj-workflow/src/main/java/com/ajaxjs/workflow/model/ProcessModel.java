@@ -1,15 +1,15 @@
 package com.ajaxjs.workflow.model;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import com.ajaxjs.workflow.model.node.NodeModel;
 import com.ajaxjs.workflow.model.node.StartModel;
 import com.ajaxjs.workflow.model.node.work.TaskModel;
 import com.ajaxjs.workflow.model.node.work.WorkModel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 流程定义 process 元素
