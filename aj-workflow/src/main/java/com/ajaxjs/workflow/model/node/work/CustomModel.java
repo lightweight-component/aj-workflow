@@ -1,8 +1,8 @@
 package com.ajaxjs.workflow.model.node.work;
 
-import com.ajaxjs.data.CRUD;
+import com.ajaxjs.sqlman.crud.Entity;
+import com.ajaxjs.util.reflect.Clazz;
 import com.ajaxjs.util.reflect.Methods;
-import com.ajaxjs.util.reflect.NewInstance;
 import com.ajaxjs.workflow.common.WfConstant;
 import com.ajaxjs.workflow.common.WfConstant.TaskType;
 import com.ajaxjs.workflow.common.WfException;
@@ -54,7 +54,7 @@ public class CustomModel extends WorkModel {
     @Override
     public void exec(Execution exec) {
         if (invokeObject == null)
-            invokeObject = NewInstance.newInstance(clazz);
+            invokeObject = Clazz.newInstance(clazz);
 
         if (invokeObject == null)
             throw new WfException("自定义模型[class=" + clazz + "]实例化对象失败");
@@ -85,8 +85,8 @@ public class CustomModel extends WorkModel {
         task.setTaskType(TaskType.RECORD);
         task.setParentId(exec.getTask() == null ? 0 : exec.getTask().getId());
 //        task.setVariable(JsonHelper.toJson(exec.getArgs()));
-        CRUD.create(task);
 
+        Entity.instance().input(task).create();
         runOutTransition(exec);
     }
 

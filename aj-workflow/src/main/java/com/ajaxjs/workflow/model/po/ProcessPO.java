@@ -1,6 +1,6 @@
 package com.ajaxjs.workflow.model.po;
 
-import com.ajaxjs.data.jdbc_helper.common.TableName;
+import com.ajaxjs.sqlman.annotation.Table;
 import com.ajaxjs.workflow.model.ProcessModel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
  * @author Frank Cheung sp42@qq.com
  */
 @Data
-@TableName("wf_process")
+@Table("wf_process")
 @EqualsAndHashCode(callSuper = true)
 public class ProcessPO extends BasePersistantObject {
     /**

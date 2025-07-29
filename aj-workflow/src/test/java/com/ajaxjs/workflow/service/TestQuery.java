@@ -2,9 +2,9 @@ package com.ajaxjs.workflow.service;
 
 import com.ajaxjs.workflow.BaseTest;
 import com.ajaxjs.workflow.model.Args;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestQuery extends BaseTest {
     public void testRead() {

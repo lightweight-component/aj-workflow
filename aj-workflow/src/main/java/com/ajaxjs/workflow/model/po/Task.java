@@ -1,8 +1,8 @@
 package com.ajaxjs.workflow.model.po;
 
-import com.ajaxjs.data.jdbc_helper.common.TableName;
-import com.ajaxjs.framework.IgnoreDB;
-import com.ajaxjs.util.convert.EntityConvert;
+import com.ajaxjs.sqlman.annotation.Table;
+import com.ajaxjs.sqlman.annotation.Transient;
+import com.ajaxjs.util.JsonUtil;
 import com.ajaxjs.workflow.common.WfConstant.PerformType;
 import com.ajaxjs.workflow.common.WfConstant.TaskType;
 import com.ajaxjs.workflow.common.WfUtils;
@@ -18,7 +18,7 @@ import java.util.Map;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("wf_task")
+@Table("wf_task")
 public class Task extends BasePersistantObject {
     /**
      *
@@ -97,10 +97,10 @@ public class Task extends BasePersistantObject {
     /**
      * TODO
      */
-    @IgnoreDB
+    @Transient
     public Long[] getActorIds() {
         if (actorIds == null) {
-            Map<String, Object> map = EntityConvert.json2map(variable);
+            Map<String, Object> map = JsonUtil.json2map(variable);
 
             if (map != null && map.get(KEY_ACTOR) != null) {
                 String actorStr = (String) map.get(KEY_ACTOR);
@@ -111,7 +111,7 @@ public class Task extends BasePersistantObject {
         return actorIds;
     }
 
-    @IgnoreDB
+    @Transient
     public TaskModel getModel() {
         return model;
     }

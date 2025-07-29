@@ -1,6 +1,6 @@
 package com.ajaxjs.workflow.model.po;
 
-import com.ajaxjs.data.jdbc_helper.common.TableName;
+import com.ajaxjs.sqlman.annotation.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -11,7 +11,7 @@ import java.util.Date;
  */
 
 @Data
-@TableName("wf_order")
+@Table("wf_order")
 @EqualsAndHashCode(callSuper = true)
 public class Order extends BasePersistantObject {
     /**

@@ -1,6 +1,6 @@
 package com.ajaxjs.workflow.model.po;
 
-import com.ajaxjs.util.convert.EntityConvert;
+import com.ajaxjs.util.JsonUtil;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -137,13 +137,13 @@ public class WorkItem implements Serializable {
 
 
     public Map<String, Object> getOrderVariableMap() {
-        Map<String, Object> map = EntityConvert.json2map(orderVariable);
+        Map<String, Object> map = JsonUtil.json2map(orderVariable);
 
         return map == null ? Collections.emptyMap() : map;
     }
 
     public Map<String, Object> getTaskVariableMap() {
-        Map<String, Object> map = EntityConvert.json2map(taskVariable);
+        Map<String, Object> map = JsonUtil.json2map(taskVariable);
 
         return map == null ? Collections.emptyMap() : map;
     }

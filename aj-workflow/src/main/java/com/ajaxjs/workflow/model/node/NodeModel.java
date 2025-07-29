@@ -1,6 +1,6 @@
 package com.ajaxjs.workflow.model.node;
 
-import com.ajaxjs.util.reflect.NewInstance;
+import com.ajaxjs.util.reflect.Clazz;
 import com.ajaxjs.workflow.common.WfException;
 import com.ajaxjs.workflow.model.BaseWfModel;
 import com.ajaxjs.workflow.model.Execution;
@@ -163,10 +163,8 @@ public abstract class NodeModel extends BaseWfModel {
         String[] arr = interceptors.split(",");
 
         for (String interceptor : arr) {
-            WorkflowInterceptor instance = NewInstance.newInstance(WorkflowInterceptor.class, interceptor);
-
-            if (instance != null)
-                fn.accept(instance);
+            WorkflowInterceptor instance = Clazz.newInstance(WorkflowInterceptor.class, interceptor);
+            fn.accept(instance);
         }
     }
 

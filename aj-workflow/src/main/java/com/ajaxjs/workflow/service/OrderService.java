@@ -1,8 +1,7 @@
 package com.ajaxjs.workflow.service;
 
-import com.ajaxjs.data.CRUD;
-import com.ajaxjs.util.convert.ConvertToJson;
-import com.ajaxjs.util.convert.EntityConvert;
+import com.ajaxjs.sqlman.crud.Entity;
+import com.ajaxjs.util.JsonUtil;
 import com.ajaxjs.workflow.common.WfConstant;
 import com.ajaxjs.workflow.common.WfData;
 import com.ajaxjs.workflow.common.WfUtils;
@@ -54,7 +53,7 @@ public class OrderService implements WfConstant {
         order.setUpdater(operator);
         order.setProcessId(process.getId());
         order.setVersion(0);
-        order.setVariable(ConvertToJson.toJson(args));
+        order.setVariable(JsonUtil.toJson(args));
 
         ProcessModel model = process.getModel();
 
@@ -84,12 +83,12 @@ public class OrderService implements WfConstant {
      * @return 新建 id
      */
     private Long create(Order order) {
-        Long id = CRUD.create(order);
+        Long id = Entity.instance().input(order).create(Long.class).getNewlyId();
         order.setId(id);
         log.info("保存历史流程实例 {}", order.getName());
         OrderHistory history = new OrderHistory(order);// 复制一份
         history.setStat(WfConstant.STATE_ACTIVE);
-        CRUD.create(history);
+        Entity.instance().input(history).create();
 
         return id;
     }
@@ -98,7 +97,7 @@ public class OrderService implements WfConstant {
      * 更新流程实例。更新活动实例的 last_Updater、last_Update_Time、expire_Time、version、variable
      */
     public int update(Order order) {
-        return CRUD.update(order) ? 1 : 0;
+        return Entity.instance().input(order).update().isOk() ? 1 : 0;
     }
 
     /**
@@ -110,7 +109,7 @@ public class OrderService implements WfConstant {
     public void addVariable(Long orderId, Map<String, Object> args) {
         Order order = WfData.findOrderHistory(orderId);
 
-        Map<String, Object> data = EntityConvert.json2map(order.getVariable());
+        Map<String, Object> data = JsonUtil.json2map(order.getVariable());
         if (data == null)
             data = Collections.emptyMap();
 
@@ -118,7 +117,7 @@ public class OrderService implements WfConstant {
 
         Order _order = new Order();
         _order.setId(orderId);
-        _order.setVariable(ConvertToJson.toJson(data));
+        _order.setVariable(JsonUtil.toJson(data));
 
         update(_order);
     }
@@ -137,7 +136,7 @@ public class OrderService implements WfConstant {
         history.setId(id);
         history.setStat(state);
         history.setEndDate(new Date());
-        CRUD.update(history);
+        Entity.instance().input(history).update();
         getCompletion().accept(null, history);
 
         return history;
@@ -182,7 +181,7 @@ public class OrderService implements WfConstant {
         OrderHistory _historyOrder = new OrderHistory(); // 不用 update 那么多字段
         _historyOrder.setId(historyOrder.getId());
         _historyOrder.setStat(WfConstant.STATE_ACTIVE);
-        CRUD.update(_historyOrder);
+        Entity.instance().input(_historyOrder).update();
 
         List<TaskHistory> histTasks = WfData.findHistoryTasksByOrderId(orderId);
 
@@ -207,19 +206,20 @@ public class OrderService implements WfConstant {
         List<TaskHistory> historyTasks = WfData.findHistoryTasksByOrderId(orderId);
 
         for (Task task : activeTasks)
-            CRUD.delete(task);
+            Entity.instance().input(task).delete();
 
         for (TaskHistory historyTask : historyTasks)
-            CRUD.delete(historyTask);
+            Entity.instance().input(historyTask).delete();
 
         List<OrderCc> ccOrders = ccOrderService.findByOrderId(orderId);
 
         for (OrderCc ccOrder : ccOrders)
-            CRUD.delete(ccOrder);
+            Entity.instance().input(ccOrder).delete();
 
         Order order = WfData.findOrder(orderId);
-        CRUD.delete(WfData.findOrderHistory(orderId));
-        CRUD.delete(order);
+
+        Entity.instance().input(WfData.findOrderHistory(orderId)).delete();
+        Entity.instance().input(order).delete();
     }
 
     /**

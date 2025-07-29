@@ -1,6 +1,7 @@
 package com.ajaxjs.workflow.service;
 
-import com.ajaxjs.data.CRUD;
+import com.ajaxjs.sqlman.Sql;
+import com.ajaxjs.sqlman.crud.Entity;
 import com.ajaxjs.workflow.common.WfConstant;
 import com.ajaxjs.workflow.model.po.Surrogate;
 import org.springframework.stereotype.Component;
@@ -49,7 +50,7 @@ public class SurrogateService implements WfConstant {
         if (entity.getStat() == null)
             entity.setStat(1);
 
-        CRUD.create(entity);
+        Entity.instance().input(entity).create();
     }
 
     /**

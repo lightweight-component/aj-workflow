@@ -1,6 +1,6 @@
 package com.ajaxjs.workflow.common;
 
-import com.ajaxjs.data.CRUD;
+import com.ajaxjs.sqlman.Sql;
 import com.ajaxjs.util.StrUtil;
 import com.ajaxjs.workflow.model.po.*;
 import org.springframework.util.ObjectUtils;
@@ -13,11 +13,11 @@ import java.util.Objects;
  */
 public interface WfData {
     static List<ProcessPO> findProcess() {
-        return CRUD.list(ProcessPO.class, "SELECT * FROM wf_process");
+        return Sql.instance().input("SELECT * FROM wf_process").queryList(ProcessPO.class);
     }
 
     static ProcessPO findProcess(Long id) {
-        return CRUD.info(ProcessPO.class, "SELECT * FROM wf_process WHERE id = ?", id);
+        return  Sql.instance().input("SELECT * FROM wf_process WHERE id = ?", id).query(ProcessPO.class);
     }
 
     static List<ProcessPO> findProcess(String name, Integer version) {
@@ -40,7 +40,7 @@ public interface WfData {
      * @return 任务
      */
     static Task findTask(Long id) {
-        Task task = CRUD.info(Task.class, "SELECT * FROM wf_task WHERE id = ?", id);
+        Task task = Sql.instance().input("SELECT * FROM wf_task WHERE id = ?", id).query(Task.class);
         Objects.requireNonNull(task, "指定的任务[id=" + id + "]不存在");
 
         return task;
@@ -129,11 +129,11 @@ public interface WfData {
     static List<Order> findByIdAndExcludedIds(Long parentId, Long... childOrderId) {
         String sql = "SELECT * FROM wf_order WHERE parent_id = ? AND id NOT IN (" + StrUtil.join(childOrderId, ",") + ")";
 
-        return CRUD.list(Order.class, sql, parentId);
+        return Sql.instance().input(sql, parentId).queryList(Order.class);
     }
 
     static OrderHistory findOrderHistory(Long id) {
-        return CRUD.info(OrderHistory.class, "SELECT * FROM wf_order_history WHERE id = ?", id);
+        return Sql.instance().input("SELECT * FROM wf_order_history WHERE id = ?", id).query(OrderHistory.class);
     }
 
 //	interface OrderHistoryDao extends IDataService<OrderHistory> {

@@ -3,7 +3,7 @@ package com.ajaxjs.workflow.flow;
 import com.ajaxjs.workflow.BaseTest;
 import com.ajaxjs.workflow.model.Args;
 import com.ajaxjs.workflow.model.po.Order;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestCC extends BaseTest {
     @Test

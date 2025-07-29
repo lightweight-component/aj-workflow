@@ -4,11 +4,10 @@ import com.ajaxjs.workflow.BaseTest;
 import com.ajaxjs.workflow.model.Args;
 import com.ajaxjs.workflow.model.node.work.TaskModel;
 import com.ajaxjs.workflow.model.po.Order;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.Assert.assertNotNull;
-
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestTask extends BaseTest {
     @Autowired

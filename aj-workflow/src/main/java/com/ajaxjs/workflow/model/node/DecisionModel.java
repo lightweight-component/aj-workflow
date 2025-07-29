@@ -1,6 +1,6 @@
 package com.ajaxjs.workflow.model.node;
 
-import com.ajaxjs.util.reflect.NewInstance;
+import com.ajaxjs.util.reflect.Clazz;
 import com.ajaxjs.workflow.common.WfException;
 import com.ajaxjs.workflow.model.Execution;
 import com.ajaxjs.workflow.model.TransitionModel;
@@ -128,6 +128,6 @@ public class DecisionModel extends NodeModel {
         this.handleClass = handleClass;
 
         if (StringUtils.hasText(handleClass))
-            decide = (DecisionHandler) NewInstance.newInstance(handleClass);
+            decide = (DecisionHandler) Clazz.newInstance(handleClass);
     }
 }

@@ -1,6 +1,6 @@
 package com.ajaxjs.workflow.service;
 
-import com.ajaxjs.data.CRUD;
+import com.ajaxjs.sqlman.crud.Entity;
 import com.ajaxjs.util.cache.Cache;
 import com.ajaxjs.util.cache.CacheManager;
 import com.ajaxjs.util.cache.CacheManagerAware;
@@ -65,7 +65,7 @@ public class ProcessService implements CacheManagerAware, WfConstant {
         Integer ver = WfData.getLatestProcessVersion(model.getName()); // 同名的，设置不同的版本号
         bean.setVersion(ver == null || ver < 0 ? 0 : ver + 1);
 
-        long newlyId = CRUD.create(bean);
+        long newlyId = Entity.instance().input(bean).create(long.class).getNewlyId();
 
         bean.setModel(model);
         saveCache(newlyId, bean);
@@ -84,8 +84,7 @@ public class ProcessService implements CacheManagerAware, WfConstant {
         ProcessPO bean = new ProcessPO();
         bean.setId(id);
         bean.setStat(WfConstant.STATE_FINISH);
-        CRUD.update(bean);
-
+        Entity.instance().input(bean).update();
         String name = nameCache.get(id);
 
         if (name != null) {

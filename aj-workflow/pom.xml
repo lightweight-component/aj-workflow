@@ -3,8 +3,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>com.ajaxjs</groupId>
-        <artifactId>ajaxjs-parent</artifactId>
-        <version>1.32</version>
+        <artifactId>aj-common-parent</artifactId>
+        <version>2.6</version>
         <relativePath/>
     </parent>
 
@@ -15,6 +15,12 @@
     <description>工作流服务</description>
 
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
         <dependency>
             <groupId>com.ajaxjs</groupId>
             <artifactId>aj-cache</artifactId>

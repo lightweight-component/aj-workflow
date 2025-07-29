@@ -1,8 +1,7 @@
 package com.ajaxjs.workflow.service;
 
-import com.ajaxjs.data.CRUD;
-import com.ajaxjs.util.convert.ConvertToJson;
-import com.ajaxjs.util.convert.EntityConvert;
+import com.ajaxjs.sqlman.crud.Entity;
+import com.ajaxjs.util.JsonUtil;
 import com.ajaxjs.workflow.common.WfConstant;
 import com.ajaxjs.workflow.common.WfData;
 import com.ajaxjs.workflow.common.WfException;
@@ -71,7 +70,7 @@ public class TaskService implements WfConstant {
      */
     public Task complete(Long taskId, Long operator, Map<String, Object> args) {
         Task task = WfData.findTask(taskId);
-        task.setVariable(ConvertToJson.toJson(args));
+        task.setVariable(JsonUtil.toJson(args));
 
 //		if (!isAllowed(task, operator))
 //			throw new WorkflowException("当前参与者[" + operator + "]不允许执行任务[taskId=" + taskId + "]");
@@ -94,7 +93,7 @@ public class TaskService implements WfConstant {
         }
 
         WfData.createTaskHistory(history);
-        CRUD.delete(task);
+        Entity.instance().input(task).delete();
 
 //		orderService.getCompletion().accept(history, null);
 
@@ -119,7 +118,7 @@ public class TaskService implements WfConstant {
         u.setId(taskId);
         u.setOperator(operator);
         u.setFinishDate(new Date());
-        CRUD.update(u);
+        Entity.instance().input(u).update();
 
         task.setOperator(operator);
         task.setFinishDate(u.getFinishDate());
@@ -146,7 +145,7 @@ public class TaskService implements WfConstant {
             throw new WfException("后续活动任务已完成或不存在，无法撤回.");
 
         for (Task task : tasks)
-            CRUD.delete(task);
+            Entity.instance().input(task).delete();
 
         Task task = history.undoTask();
         saveTask(task);
@@ -304,7 +303,7 @@ public class TaskService implements WfConstant {
      */
     private static Task saveTask(Task task, Long... actors) {
         task.setPerformType(PerformType.ANY);
-        Long newlyId = CRUD.create(task);
+        Long newlyId = Entity.instance().input(task).create(Long.class).getNewlyId();
         assignTask(newlyId, actors);
         task.setActorIds(actors);
 
@@ -335,7 +334,7 @@ public class TaskService implements WfConstant {
             task.setParentId(exec.getTask().getId());
 
         Map<String, Object> args = getArgs(exec, actors);
-        task.setVariable(ConvertToJson.toJson(args));
+        task.setVariable(JsonUtil.toJson(args));
 
         // 设置 actionUrl
         String form = taskModel.getForm();
@@ -492,7 +491,7 @@ public class TaskService implements WfConstant {
 
         if (task.getTaskType() == TaskType.MAJOR) {
             // removeTaskActor(task.getId(), actors);
-            Map<String, Object> taskData = EntityConvert.json2map(task.getVariable());
+            Map<String, Object> taskData = JsonUtil.json2map(task.getVariable());
             String actorStr = (String) taskData.get(Task.KEY_ACTOR);
 
             if (StringUtils.hasText(actorStr)) {
@@ -520,8 +519,8 @@ public class TaskService implements WfConstant {
 
                 newActor.deleteCharAt(newActor.length() - 1);
                 taskData.put(Task.KEY_ACTOR, newActor.toString());
-                task.setVariable(ConvertToJson.toJson(taskData));
-                CRUD.update(task);
+                task.setVariable(JsonUtil.toJson(taskData));
+                Entity.instance().input(task).update();
             }
         }
     }
@@ -554,16 +553,16 @@ public class TaskService implements WfConstant {
 
         if (performType == null || performType == PerformType.ANY) {
             assignTask(task.getId(), actors);
-            Map<String, Object> data = EntityConvert.json2map(task.getVariable());
+            Map<String, Object> data = JsonUtil.json2map(task.getVariable());
 
             if (data == null)
                 data = Collections.emptyMap();
 
             String oldActor = (String) data.get(Task.KEY_ACTOR);
             data.put(Task.KEY_ACTOR, oldActor + "," + WfUtils.join(actors));
-            task.setVariable(ConvertToJson.toJson(data));
+            task.setVariable(JsonUtil.toJson(data));
 
-            if (!CRUD.update(task))
+            if (!Entity.instance().input(task).update().isOk())
                 log.info("更新任务失败");
         } else if (performType == PerformType.ALL) {
             try {
@@ -571,15 +570,16 @@ public class TaskService implements WfConstant {
                     Task newTask = (Task) task.clone();
                     newTask.setOperator(actor);
 
-                    Map<String, Object> taskData = EntityConvert.json2map(task.getVariable());
+                    Map<String, Object> taskData = JsonUtil.json2map(task.getVariable());
                     if (taskData == null)
                         taskData = Collections.emptyMap();
 
                     taskData.put(Task.KEY_ACTOR, actor);
-                    task.setVariable(ConvertToJson.toJson(taskData));
+                    task.setVariable(JsonUtil.toJson(taskData));
 
-                    if (CRUD.create(newTask) == null)
+                    if (!Entity.instance().input(newTask).create().isOk())
                         log.info("创建任务失败");
+
                     assignTask(newTask.getId(), actor);
                 }
             } catch (CloneNotSupportedException ex) {
@@ -659,7 +659,7 @@ public class TaskService implements WfConstant {
             List<Args> vars = new ArrayList<>();
 
             for (TaskHistory hist : histTasks) {
-                Map<String, Object> map = EntityConvert.json2map(hist.getVariable());
+                Map<String, Object> map = JsonUtil.json2map(hist.getVariable());
                 if (map == null)
                     map = Collections.emptyMap();
 

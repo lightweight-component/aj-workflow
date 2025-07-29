@@ -4,12 +4,12 @@ import com.ajaxjs.workflow.BaseTest;
 import com.ajaxjs.workflow.model.Args;
 import com.ajaxjs.workflow.model.Execution;
 import com.ajaxjs.workflow.model.po.Order;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 import java.util.function.Function;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestDecision extends BaseTest {
     // 测试决策分支流程1：决策节点 decision 使用 expr 属性决定后置路线

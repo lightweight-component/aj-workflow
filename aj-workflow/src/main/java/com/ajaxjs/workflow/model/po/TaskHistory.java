@@ -1,8 +1,7 @@
 package com.ajaxjs.workflow.model.po;
 
-
-import com.ajaxjs.data.jdbc_helper.common.TableName;
-import com.ajaxjs.framework.IgnoreDB;
+import com.ajaxjs.sqlman.annotation.Table;
+import com.ajaxjs.sqlman.annotation.Transient;
 import com.ajaxjs.workflow.common.WfConstant.PerformType;
 
 /**
@@ -10,9 +9,9 @@ import com.ajaxjs.workflow.common.WfConstant.PerformType;
  * <p>
  * history 减少了 version 字段
  */
-@TableName("wf_task_history")
+@Table("wf_task_history")
 public class TaskHistory extends Task {
-    @IgnoreDB
+    @Transient
     @Override
     public Integer getVersion() {
         return null;
@@ -70,7 +69,7 @@ public class TaskHistory extends Task {
      *
      * @return true 表示为任意的参与类型
      */
-    @IgnoreDB
+    @Transient
     public boolean isPerformAny() {
         return getPerformType() == PerformType.ANY;
     }

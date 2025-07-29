@@ -1,6 +1,6 @@
 package com.ajaxjs.workflow.model.node.work;
 
-import com.ajaxjs.util.reflect.NewInstance;
+import com.ajaxjs.util.reflect.Clazz;
 import com.ajaxjs.workflow.model.Execution;
 import com.ajaxjs.workflow.model.FieldModel;
 import com.ajaxjs.workflow.model.TransitionModel;
@@ -154,7 +154,7 @@ public class TaskModel extends WorkModel {
     public void setCallback(String callbackStr) {
         if (StringUtils.hasText(callbackStr)) {
             this.callback = callbackStr;
-            callbackObject = (JobCallback) NewInstance.newInstance(callbackStr);
+            callbackObject = (JobCallback) Clazz.newInstance(callbackStr);
             Objects.requireNonNull(callbackObject, "回调处理类实例化失败");
         }
     }

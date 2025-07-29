@@ -1,6 +1,6 @@
 package com.ajaxjs.workflow;
 
-import com.ajaxjs.util.convert.EntityConvert;
+import com.ajaxjs.util.JsonUtil;
 import com.ajaxjs.workflow.common.WfConstant;
 import com.ajaxjs.workflow.common.WfConstant.TaskType;
 import com.ajaxjs.workflow.common.WfData;
@@ -267,7 +267,7 @@ public class WorkflowEngine {
         if (task.getTaskType() != TaskType.MAJOR)
             return null;
 
-        Map<String, Object> orderMaps = EntityConvert.json2map(order.getVariable());
+        Map<String, Object> orderMaps = JsonUtil.json2map(order.getVariable());
         if (orderMaps == null)
             orderMaps = Collections.emptyMap();
 

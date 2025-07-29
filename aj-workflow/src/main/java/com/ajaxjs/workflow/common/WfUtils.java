@@ -1,5 +1,6 @@
 package com.ajaxjs.workflow.common;
 
+import com.ajaxjs.util.DateHelper;
 import com.ajaxjs.workflow.model.ProcessModel;
 
 import java.lang.reflect.Array;
@@ -52,7 +53,7 @@ public class WfUtils {
      * @return 流程实例编号
      */
     public static String generate(ProcessModel model) {
-        return DateUtil.now("yyyyMMdd-HH:mm:ss-SSS") + "-" + new Random().nextInt(1000);
+        return DateHelper.now("yyyyMMdd-HH:mm:ss-SSS") + "-" + new Random().nextInt(1000);
     }
 
     private static final Pattern pattern = Pattern.compile("[0-9]*");

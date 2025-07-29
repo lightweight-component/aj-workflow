@@ -1,7 +1,6 @@
 package com.ajaxjs.workflow.model.po;
 
-
-import com.ajaxjs.data.jdbc_helper.common.TableName;
+import com.ajaxjs.sqlman.annotation.Table;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -11,7 +10,7 @@ import java.util.Date;
  * 委托代理实体类
  */
 @Data
-@TableName("wf_surrogate")
+@Table("wf_surrogate")
 public class Surrogate implements Serializable {
     private static final long serialVersionUID = -7359321877096338448L;
 
