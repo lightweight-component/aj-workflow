@@ -1,0 +1,4 @@
+Sitemap: https://workflow.ajaxjs.com/sitemap.xml
+
+User-agent: *
+Disallow:

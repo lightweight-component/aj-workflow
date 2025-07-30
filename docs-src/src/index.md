@@ -5,51 +5,25 @@ description: AJ Utilities Home
 date: 2025-01-05
 tags:
   - AJ Utilities Home
-layout: layouts/aj-util.njk
+layout: layouts/docs.njk
 ---
+# AJ-Workflow 简介
+AJ-Workflow，一种简明扼要的工作流模型，易维护、易扩展 ——轻量级、开源、免费。
+[管理主界面]
+进入演示，账号：demo_user，密码：demo_user
 
-# AJ Utilities
+AJAXJS Workflow可简称为 aj-wf，主打轻量级和简洁。总结起来 aj-wf 就是一句话：2个 Jar 包7张表，Jar 包约 100kb，表创建到数据库中就可以了，当然还有一个配置文件。
+## 特点
 
-Small Java Utils Library with many powerful components. The size of jar is around 90kb. It contains the following
-modules:
+- 轻量强大，引擎核心仅 8 张表实现逻辑数据存储
+- 组件化集成，采用组件化设计方案、方便引入任何开发平台，接口插拔式设计更加灵活的自定义扩展。
+- 中国式审批。支持动态加签、任意驳回、拿回、撤销、已阅、沟通等中国式特色审批
 
-| Class/Package Module | Detail Description                                                                     | Memo                                      |
-|----------------------|----------------------------------------------------------------------------------------|-------------------------------------------|
-| BytesHelper          | Byte array utility class                                                               |                                           |
-| CollUtils            | Collection utility class                                                               |                                           |
-| ConvertBasicValue    | Attempts to convert target type, note that not all types can be converted              |                                           |
-| DateHelper           | Date utility class                                                                     |                                           |
-| EncodeTools          | String URL/Base64 encoder                                                              |                                           |
-| MessageDigestHelper  | MD5/SHA1/SHA256/384/512 encryption utility class                                       |                                           |
-| ObjectHelper         | A helper for Java Object                                                               |                                           |
-| HTTP Request         | A Small HTTP Request Component                                                         |                                           |
-| RandomTools          | Random Numbers and Strings                                                             |                                           |
-| RegExpUtils          | Regular expression utility class                                                       |                                           |
-| StrUtil              | String utility class                                                                   |                                           |
-| JsonUtil             | Encapsulation of Jackson Library: Conversion Methods Between JSON, Map, Bean, and List | Jackson is only library that dependencies |
-| XmlHelper            | XML processing utility class                                                           |                                           |
-| Cryptography         | AES/RSA encryption and decryption package                                              |                                           |
-| IO                   | File, resource, stream utility package                                                 |                                           |
-| Reflection           | Reflection utility package                                                             |                                           |
+## 工作流概念
 
-## Source code
+工作流框架的基本概念：
 
-[Github](https://github.com/lightweight-component/aj-util) | [GitCode](https://gitcode.com/lightweight-component/aj-util)
+> 工作流（Workflow），就是“业务过程的部分或整体在计算机应用环境下的自动化”，它主要解决的是“使在多个参与者之间按照某种预定义的规则传递文档、信息或任务的过程自动进行，从而实现某个预期的业务目标，或者促使此目标的实现”。
+> 工作流管理系统（Workflow Management System, WfMS）是一个软件系统，它完成工作量的定义和管理，并按照在系统中预先定义好的工作流逻辑进行工作流实例的执行。工作流管理系统不是企业的业务系统，而是为企业的业务系统的运行提供了一个软件的支撑环境。
 
-## Links
-
-[User Manual](https://aj-util.ajaxjs.com) | [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/lightweight-component/aj-util) | [Java Documents](https://javadoc.io/doc/com.ajaxjs/ajaxjs-util)
-
-## Install
-
-Runs on Java 8+. Maven:
-
-```xml
-<dependency>
-    <groupId>com.ajaxjs</groupId>
-    <artifactId>ajaxjs-util</artifactId>
-    <version>1.2.5</version>
-</dependency>
-```
-
-[![Maven Central](https://img.shields.io/maven-central/v/com.ajaxjs/ajaxjs-util?label=Latest%20Release)](https://central.sonatype.com/artifact/com.ajaxjs/ajaxjs-util)
+常见的工作流框架：JBPM、Activiti、OSWorkFlow。
