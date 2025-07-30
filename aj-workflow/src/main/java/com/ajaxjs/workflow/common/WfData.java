@@ -1,6 +1,7 @@
 package com.ajaxjs.workflow.common;
 
 import com.ajaxjs.sqlman.Sql;
+import com.ajaxjs.sqlman.crud.Entity;
 import com.ajaxjs.util.StrUtil;
 import com.ajaxjs.workflow.model.po.*;
 import org.springframework.util.ObjectUtils;
@@ -17,7 +18,7 @@ public interface WfData {
     }
 
     static ProcessPO findProcess(Long id) {
-        return  Sql.instance().input("SELECT * FROM wf_process WHERE id = ?", id).query(ProcessPO.class);
+        return Sql.instance().input("SELECT * FROM wf_process WHERE id = ?", id).query(ProcessPO.class);
     }
 
     static List<ProcessPO> findProcess(String name, Integer version) {
@@ -26,11 +27,11 @@ public interface WfData {
         if (version != null)
             sql += " AND version = " + version;
 
-        return CRUD.list(ProcessPO.class, sql, name);
+        return Sql.instance().input(sql, name).queryList(ProcessPO.class);
     }
 
     static Integer getLatestProcessVersion(String name) {
-        return CRUD.jdbcReaderFactory().queryOne("SELECT max(version) FROM wf_process WHERE name = ?", Integer.class, name);
+        return Sql.instance().input("SELECT max(version) FROM wf_process WHERE name = ?", name).queryOne(Integer.class);
     }
 
     /**
@@ -60,23 +61,23 @@ public interface WfData {
             sql += "AND name IN (" + String.join(",", activeNodes) + ")";
         }
 
-        return CRUD.list(Task.class, sql, id);
+        return Sql.instance().input(sql, id).queryList(Task.class);
     }
 
     static List<Task> findNextActiveTasks(Long id, String taskName, Long parentTaskId) {
         String sql = "SELECT * FROM wf_task WHERE parent_task_id IN "
                 + "( SELECT ht.id FROM wf_task_history ht WHERE ht.order_id = ? AND ht.name = ? AND ht.parent_task_id = ? )";
 
-        return CRUD.list(Task.class, sql, id, taskName, parentTaskId);
+        return Sql.instance().input(sql, id, taskName, parentTaskId).queryList(Task.class);
     }
 
     static List<TaskActor> findTaskActorsByTaskId(Long taskId) {
-        return CRUD.list(TaskActor.class, "SELECT * FROM wf_task_actor WHERE task_id = ?", taskId);
+        return Sql.instance().input("SELECT * FROM wf_task_actor WHERE task_id = ?", taskId).queryList(TaskActor.class);
     }
 
     static void createTaskActor(Long taskId, Long actorId) {
         String sql = "INSERT INTO wf_task_actor (task_id, actor_id) VALUES (?, ?)";
-        CRUD.jdbcWriterFactory().insert(sql, taskId, actorId);
+        Sql.instance().input(sql, taskId, actorId).create(true, Long.class);
     }
 
     /**
@@ -86,15 +87,15 @@ public interface WfData {
      * @return 所有的任务
      */
     static List<Task> findTasksByOrderId(Long orderId) {
-        return CRUD.list(Task.class, "SELECT * FROM wf_task WHERE order_id = ?", orderId);
+        return Sql.instance().input("SELECT * FROM wf_task WHERE order_id = ?", orderId).queryList(Task.class);
     }
 
     static List<Task> findTasksByParentTaskId(Long parentTaskId) {
-        return CRUD.list(Task.class, "SELECT * FROM wf_task WHERE parent_task_id = ?", parentTaskId);
+        return Sql.instance().input("SELECT * FROM wf_task WHERE parent_task_id = ?", parentTaskId).queryList(Task.class);
     }
 
     static TaskHistory findTaskHistory(Long id) {
-        return CRUD.info(TaskHistory.class, "SELECT * FROM wf_task_history WHERE id = ?", id);
+        return Sql.instance().input("SELECT * FROM wf_task_history WHERE id = ?", id).query(TaskHistory.class);
     }
 
     /**
@@ -104,7 +105,7 @@ public interface WfData {
      * @return 所有的历史任务
      */
     static List<TaskHistory> findHistoryTasksByOrderId(Long orderId) {
-        return CRUD.list(TaskHistory.class, "SELECT * FROM wf_task_history WHERE order_id = ?", orderId);
+        return Sql.instance().input("SELECT * FROM wf_task_history WHERE order_id = ?", orderId).queryList(TaskHistory.class);
     }
 
     /**
@@ -115,15 +116,15 @@ public interface WfData {
      * @return 所有的历史任务
      */
     static List<TaskHistory> findHistoryTasksByOrderIdAndTaskName(Long orderId, String taskName) {
-        return CRUD.list(TaskHistory.class, "SELECT * FROM wf_task_history WHERE order_id = ? AND name = ?", orderId, taskName);
+        return Sql.instance().input("SELECT * FROM wf_task_history WHERE order_id = ? AND name = ?", orderId, taskName).queryList(TaskHistory.class);
     }
 
     static void createTaskHistory(TaskHistory history) {
-        CRUD.create(history);
+        Entity.instance().input(history).create();
     }
 
     static Order findOrder(Long id) {
-        return CRUD.info(Order.class, "SELECT * FROM wf_order WHERE id = ?", id);
+        return Sql.instance().input("SELECT * FROM wf_order WHERE id = ?", id).query(Order.class);
     }
 
     static List<Order> findByIdAndExcludedIds(Long parentId, Long... childOrderId) {
