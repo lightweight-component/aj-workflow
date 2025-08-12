@@ -1,6 +1,6 @@
 package com.ajaxjs.workflow.service.parser;
 
-import com.ajaxjs.framework.spring.DiContextUtil;
+import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.util.DateHelper;
 import com.ajaxjs.util.XmlHelper;
 import com.ajaxjs.util.reflect.Clazz;
