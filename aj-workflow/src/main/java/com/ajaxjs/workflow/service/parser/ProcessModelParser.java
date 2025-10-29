@@ -1,8 +1,8 @@
 package com.ajaxjs.workflow.service.parser;
 
 import com.ajaxjs.spring.DiContextUtil;
-import com.ajaxjs.util.DateHelper;
 import com.ajaxjs.util.XmlHelper;
+import com.ajaxjs.util.date.DateTools;
 import com.ajaxjs.util.reflect.Clazz;
 import com.ajaxjs.workflow.model.ProcessModel;
 import com.ajaxjs.workflow.model.TransitionModel;
@@ -28,7 +28,7 @@ public class ProcessModelParser {
         assert element != null;
         process.setName(element.getAttribute(AbstractNodeParser.ATTR_NAME));
         process.setDisplayName(element.getAttribute(AbstractNodeParser.ATTR_DISPLAY_NAME));
-        process.setExpireDate(DateHelper.object2Date(element.getAttribute(AbstractNodeParser.ATTR_EXPIRE_TIME)));
+        process.setExpireDate(DateTools.object2Date(element.getAttribute(AbstractNodeParser.ATTR_EXPIRE_TIME)));
         process.setInstanceUrl(element.getAttribute(AbstractNodeParser.ATTR_INSTANCE_URL));
         process.setInstanceNoClass(element.getAttribute(AbstractNodeParser.ATTR_INSTANCE_NO_CLASS));
 

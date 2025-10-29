@@ -86,7 +86,7 @@ public class OrderCcService {
     public void deleteCCOrder(Long orderId, Long actorId) {
         List<OrderCc> orders = findList(orderId, actorId);
 
-        for (OrderCc order : orders)
-            CRUD.delete(order, order.getId());
+//        for (OrderCc order : orders)
+//            CRUD.delete(order, order.getId());
     }
 }

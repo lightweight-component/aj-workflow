@@ -1,6 +1,6 @@
 package com.ajaxjs.workflow.service.parser;
 
-import com.ajaxjs.util.DateHelper;
+import com.ajaxjs.util.date.DateTools;
 import com.ajaxjs.workflow.model.FieldModel;
 import com.ajaxjs.workflow.model.node.NodeModel;
 import com.ajaxjs.workflow.model.node.work.TaskModel;
@@ -34,10 +34,10 @@ public class TaskParser extends AbstractNodeParser {
         TaskModel task = (TaskModel) node;
         task.setForm(element.getAttribute(ATTR_FORM));
         task.setAssignee(element.getAttribute(ATTR_ASSIGNEE));
-        task.setExpireTime(DateHelper.object2Date(element.getAttribute(ATTR_EXPIRE_TIME)));
+        task.setExpireTime(DateTools.object2Date(element.getAttribute(ATTR_EXPIRE_TIME)));
         task.setAutoExecute(element.getAttribute(ATTR_AUTO_EXECUTE));
         task.setCallback(element.getAttribute(ATTR_CALLBACK));
-        task.setReminderTime(DateHelper.object2Date(element.getAttribute(ATTR_REMINDER_TIME)));
+        task.setReminderTime(DateTools.object2Date(element.getAttribute(ATTR_REMINDER_TIME)));
         task.setReminderRepeat(element.getAttribute(ATTR_REMINDER_REPEAT));
         task.setPerformType(element.getAttribute(ATTR_PERFORM_TYPE));
         task.setTaskType(element.getAttribute(ATTR_TASK_TYPE));
