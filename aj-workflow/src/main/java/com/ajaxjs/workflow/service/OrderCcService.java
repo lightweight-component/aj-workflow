@@ -1,7 +1,6 @@
 package com.ajaxjs.workflow.service;
 
-import com.ajaxjs.sqlman.Sql;
-import com.ajaxjs.sqlman.crud.Entity;
+import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.StrUtil;
 import com.ajaxjs.workflow.common.WfConstant;
 import com.ajaxjs.workflow.model.po.OrderCc;
@@ -26,7 +25,7 @@ public class OrderCcService {
      * @return 抄送列表
      */
     public List<OrderCc> findByOrderId(Long orderId) {
-        return Sql.instance().input(sql, orderId).queryList(OrderCc.class);
+        return new Action(sql).query(orderId).list(OrderCc.class);
     }
 
     /**
@@ -39,7 +38,7 @@ public class OrderCcService {
     public List<OrderCc> findList(Long orderId, Long... actorIds) {
         String _sql = sql + " AND actor_id IN (" + StrUtil.join(actorIds, ",") + ")";
 
-        return Sql.instance().input(_sql, orderId).queryList(OrderCc.class);
+        return new Action(_sql).query(orderId).list(OrderCc.class);
     }
 
     /**
@@ -57,7 +56,7 @@ public class OrderCcService {
             coder.setActorId(actorId);
             coder.setStat(WfConstant.STATE_ACTIVE);
 
-            Entity.instance().input(coder).create();
+            new Action(coder).create().execute(true);
         }
     }
 
@@ -73,7 +72,7 @@ public class OrderCcService {
         for (OrderCc order : orders) {
             order.setStat(WfConstant.STATE_FINISH);
             order.setFinishDate(new Date());
-            Entity.instance().input(order).update();
+            new Action((order)).update().withId();
         }
     }
 

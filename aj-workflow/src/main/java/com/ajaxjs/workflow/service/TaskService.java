@@ -1,6 +1,6 @@
 package com.ajaxjs.workflow.service;
 
-import com.ajaxjs.sqlman.crud.Entity;
+import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.JsonUtil;
 import com.ajaxjs.workflow.common.WfConstant;
 import com.ajaxjs.workflow.common.WfData;
@@ -93,7 +93,7 @@ public class TaskService implements WfConstant {
         }
 
         WfData.createTaskHistory(history);
-        Entity.instance().input(task).delete();
+        new Action(task).delete();
 
 //		orderService.getCompletion().accept(history, null);
 
@@ -118,7 +118,7 @@ public class TaskService implements WfConstant {
         u.setId(taskId);
         u.setOperator(operator);
         u.setFinishDate(new Date());
-        Entity.instance().input(u).update();
+        new Action(u).update();
 
         task.setOperator(operator);
         task.setFinishDate(u.getFinishDate());
@@ -145,7 +145,7 @@ public class TaskService implements WfConstant {
             throw new WfException("后续活动任务已完成或不存在，无法撤回.");
 
         for (Task task : tasks)
-            Entity.instance().input(task).delete();
+            new Action(task).delete();
 
         Task task = history.undoTask();
         saveTask(task);
@@ -303,7 +303,7 @@ public class TaskService implements WfConstant {
      */
     private static Task saveTask(Task task, Long... actors) {
         task.setPerformType(PerformType.ANY);
-        Long newlyId = Entity.instance().input(task).create(Long.class).getNewlyId();
+        Long newlyId = new Action(task).create().execute(true, Long.class).getNewlyId();
         assignTask(newlyId, actors);
         task.setActorIds(actors);
 
@@ -520,7 +520,7 @@ public class TaskService implements WfConstant {
                 newActor.deleteCharAt(newActor.length() - 1);
                 taskData.put(Task.KEY_ACTOR, newActor.toString());
                 task.setVariable(JsonUtil.toJson(taskData));
-                Entity.instance().input(task).update();
+                new Action(task).update();
             }
         }
     }
@@ -562,7 +562,7 @@ public class TaskService implements WfConstant {
             data.put(Task.KEY_ACTOR, oldActor + "," + WfUtils.join(actors));
             task.setVariable(JsonUtil.toJson(data));
 
-            if (!Entity.instance().input(task).update().isOk())
+            if (!new Action(task).update().withId().isOk())
                 log.info("更新任务失败");
         } else if (performType == PerformType.ALL) {
             try {
@@ -577,7 +577,7 @@ public class TaskService implements WfConstant {
                     taskData.put(Task.KEY_ACTOR, actor);
                     task.setVariable(JsonUtil.toJson(taskData));
 
-                    if (!Entity.instance().input(newTask).create().isOk())
+                    if (!new Action(newTask).create().execute(true).isOk())
                         log.info("创建任务失败");
 
                     assignTask(newTask.getId(), actor);

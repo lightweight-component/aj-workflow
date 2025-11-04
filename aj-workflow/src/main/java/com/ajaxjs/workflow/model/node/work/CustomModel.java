@@ -1,6 +1,6 @@
 package com.ajaxjs.workflow.model.node.work;
 
-import com.ajaxjs.sqlman.crud.Entity;
+import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.reflect.Clazz;
 import com.ajaxjs.util.reflect.Methods;
 import com.ajaxjs.workflow.common.WfConstant;
@@ -86,7 +86,7 @@ public class CustomModel extends WorkModel {
         task.setParentId(exec.getTask() == null ? 0 : exec.getTask().getId());
 //        task.setVariable(JsonHelper.toJson(exec.getArgs()));
 
-        Entity.instance().input(task).create();
+        new Action(task).create().execute(true);
         runOutTransition(exec);
     }
 
