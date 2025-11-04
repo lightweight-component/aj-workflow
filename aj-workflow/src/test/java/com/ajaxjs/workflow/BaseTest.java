@@ -1,13 +1,12 @@
 package com.ajaxjs.workflow;
 
-import com.ajaxjs.data.jdbc_helper.JdbcConn;
-import com.ajaxjs.framework.spring.filter.dbconnection.DataBaseConnection;
+
+import com.ajaxjs.framework.database.DataBaseConnection;
+import com.ajaxjs.sqlman.JdbcConnection;
 import com.ajaxjs.util.io.Resources;
 import com.ajaxjs.workflow.common.WfConstant;
 import com.ajaxjs.workflow.service.ProcessService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.runner.RunWith;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -19,7 +18,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
  * @author Frank Cheung
  */
 @ContextConfiguration(classes = TestConfig.class)
-@RunWith(SpringJUnit4ClassRunner.class)
+//@RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
 public abstract class BaseTest implements WfConstant {
     @Autowired
@@ -28,15 +27,15 @@ public abstract class BaseTest implements WfConstant {
     @Autowired
     protected WorkflowEngine engine;
 
-    @Before
+//    @Before
     public void initDb() {
 //        processService.setCacheManager(new MemoryCacheManager());
         DataBaseConnection.initDb();
     }
 
-    @After
+//    @After
     public void closeDB() {
-        JdbcConn.closeDb();
+        JdbcConnection.closeDb();
     }
 
     public long init(String xmlPath) {

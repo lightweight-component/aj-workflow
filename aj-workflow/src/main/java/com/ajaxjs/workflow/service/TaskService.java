@@ -93,7 +93,7 @@ public class TaskService implements WfConstant {
         }
 
         WfData.createTaskHistory(history);
-        new Action(task).delete();
+        new Action(task).update().delete();
 
 //		orderService.getCompletion().accept(history, null);
 
@@ -145,7 +145,7 @@ public class TaskService implements WfConstant {
             throw new WfException("后续活动任务已完成或不存在，无法撤回.");
 
         for (Task task : tasks)
-            new Action(task).delete();
+            new Action(task).update().delete();
 
         Task task = history.undoTask();
         saveTask(task);

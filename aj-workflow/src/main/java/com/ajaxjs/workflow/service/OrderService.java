@@ -206,20 +206,20 @@ public class OrderService implements WfConstant {
         List<TaskHistory> historyTasks = WfData.findHistoryTasksByOrderId(orderId);
 
         for (Task task : activeTasks)
-            new Action(task).delete();
+            new Action(task).update().delete();
 
         for (TaskHistory historyTask : historyTasks)
-            new Action(historyTask).delete();
+            new Action(historyTask).update().delete();
 
         List<OrderCc> ccOrders = ccOrderService.findByOrderId(orderId);
 
         for (OrderCc ccOrder : ccOrders)
-            new Action(ccOrder).delete();
+            new Action(ccOrder).update().delete();
 
         Order order = WfData.findOrder(orderId);
 
-        new Action(WfData.findOrderHistory(orderId)).delete();
-        new Action(order).delete();
+        new Action(WfData.findOrderHistory(orderId)).update().delete();
+        new Action(order).update().delete();
     }
 
     /**
