@@ -65,7 +65,7 @@ public class ProcessService implements CacheManagerAware, WfConstant {
         Integer ver = WfData.getLatestProcessVersion(model.getName()); // 同名的，设置不同的版本号
         bean.setVersion(ver == null || ver < 0 ? 0 : ver + 1);
 
-        long newlyId = new Action(bean).create().create(true, long.class).getNewlyId();
+        long newlyId = new Action(bean).create().execute(true, long.class).getNewlyId();
 
         bean.setModel(model);
         saveCache(newlyId, bean);
