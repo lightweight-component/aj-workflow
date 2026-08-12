@@ -21,12 +21,12 @@ public interface WfData {
     }
 
     static List<ProcessPO> findProcess(String name, Integer version) {
-        String sql = "SELECT * FROM wf_process WHERE name = ?";
+        if (version == null)
+            return new Action("SELECT * FROM wf_process WHERE name = ? ORDER BY version DESC")
+                    .query(name).list(ProcessPO.class);
 
-        if (version != null)
-            sql += " AND version = " + version;
-
-        return new Action(sql, name).query().list(ProcessPO.class);
+        return new Action("SELECT * FROM wf_process WHERE name = ? AND version = ? ORDER BY version DESC")
+                .query(name, version).list(ProcessPO.class);
     }
 
     static Integer getLatestProcessVersion(String name) {

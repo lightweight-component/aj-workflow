@@ -50,6 +50,15 @@ public class AjUtilMigrationTest {
         assertNull(new com.ajaxjs.workflow.model.po.Task().getId());
     }
 
+    @Test
+    public void processParserRejectsEmptyXmlWithoutDependingOnAssertions() {
+        IllegalArgumentException nullError = assertThrows(IllegalArgumentException.class,
+                () -> com.ajaxjs.workflow.service.parser.ProcessModelParser.parse(null));
+        assertEquals("流程定义 XML 不能为空", nullError.getMessage());
+        assertThrows(IllegalArgumentException.class,
+                () -> com.ajaxjs.workflow.service.parser.ProcessModelParser.parse("   \t"));
+    }
+
     public static final class SampleDecisionHandler implements DecisionHandler {
         @Override
         public String decide(com.ajaxjs.workflow.model.Execution execution) {

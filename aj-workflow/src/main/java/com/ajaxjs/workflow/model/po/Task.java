@@ -19,7 +19,7 @@ import java.util.Map;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Table("wf_task")
-public class Task extends BasePersistantObject {
+public class Task extends BasePersistantObject implements Cloneable {
     /**
      *
      */
@@ -117,6 +117,12 @@ public class Task extends BasePersistantObject {
     }
 
     @Override
+    /**
+     * 创建任务的浅复制；调用方在作为新任务持久化前必须清除主键。
+     *
+     * @return 任务副本
+     * @throws CloneNotSupportedException 理论上不会发生，因为本类实现了 Cloneable
+     */
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }

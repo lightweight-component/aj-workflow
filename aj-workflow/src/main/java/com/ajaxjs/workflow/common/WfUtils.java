@@ -28,7 +28,6 @@ public class WfUtils {
         return ids;
     }
 
-
     /**
      * 将数组中的元素以逗号连接起来并返回结果
      *
@@ -47,7 +46,6 @@ public class WfUtils {
 
         return str.substring(0, str.length() - 1);
     }
-
 
     /**
      * 默认的流程实例编号生成器 编号生成规则为:yyyyMMdd-HH:mm:ss-SSS-random

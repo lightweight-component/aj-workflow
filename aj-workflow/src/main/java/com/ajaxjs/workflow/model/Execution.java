@@ -142,22 +142,4 @@ public class Execution {
     public void addTask(Task task) {
         tasks.add(task);
     }
-
-    /**
-     * 判断是否已经成功合并
-     *
-     * @return 是否已经成功合并
-     */
-    public boolean isMerged() {
-        return isMerged;
-    }
-
-    /**
-     * 设置是否为已合并
-     *
-     * @param isMerged 是否为已合并
-     */
-    public void setMerged(boolean isMerged) {
-        this.isMerged = isMerged;
-    }
 }

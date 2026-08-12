@@ -1,6 +1,7 @@
 package com.ajaxjs.workflow.service.parser;
 
 import com.ajaxjs.util.XmlHelper;
+import com.ajaxjs.util.ObjectHelper;
 import com.ajaxjs.util.date.DateTools;
 import com.ajaxjs.util.reflect.Clazz;
 import com.ajaxjs.workflow.model.ProcessModel;
@@ -23,9 +24,13 @@ public class ProcessModelParser {
      * @param processXml XML
      */
     public static ProcessModel parse(String processXml) {
+        if (!ObjectHelper.hasText(processXml))
+            throw new IllegalArgumentException("流程定义 XML 不能为空");
+
         ProcessModel process = new ProcessModel();
         Element element = XmlHelper.getRoot(processXml);
-        assert element != null;
+        if (element == null)
+            throw new IllegalArgumentException("流程定义 XML 缺少根节点");
         process.setName(element.getAttribute(AbstractNodeParser.ATTR_NAME));
         process.setDisplayName(element.getAttribute(AbstractNodeParser.ATTR_DISPLAY_NAME));
         process.setExpireDate(DateTools.object2Date(element.getAttribute(AbstractNodeParser.ATTR_EXPIRE_TIME)));

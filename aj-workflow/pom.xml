@@ -78,6 +78,7 @@
                     <skipTests>false</skipTests>
                     <includes>
                         <include>**/*MigrationTest.java</include>
+                        <include>**/*UnitTest.java</include>
                     </includes>
                 </configuration>
             </plugin>

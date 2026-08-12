@@ -128,7 +128,8 @@ public class WorkflowEngine {
      */
     private Order startInstance(ProcessPO process, Long operator, Args args) {
         // 检查流程状态
-        Objects.requireNonNull(process, "指定的流程定义不存在");
+        if (process == null)
+            throw new IllegalArgumentException("指定的流程定义不存在");
         String idOrName = process.getName();
 
         if (process.getStat() != null && process.getStat().equals(WfConstant.STATE_FINISH))
