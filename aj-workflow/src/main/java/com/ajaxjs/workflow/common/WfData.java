@@ -2,8 +2,8 @@ package com.ajaxjs.workflow.common;
 
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.StrUtil;
+import com.ajaxjs.util.ObjectHelper;
 import com.ajaxjs.workflow.model.po.*;
-import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.Objects;
@@ -52,7 +52,7 @@ public interface WfData {
         if (childOrderId != null && childOrderId != 0)
             sql += "id NOT IN ( " + childOrderId + " )";
 
-        if (!ObjectUtils.isEmpty(activeNodes)) {
+        if (!ObjectHelper.isEmpty(activeNodes)) {
             int i = 0;
             for (String str : activeNodes)
                 activeNodes[i++] = "'" + str + "'";
@@ -77,6 +77,11 @@ public interface WfData {
     static void createTaskActor(Long taskId, Long actorId) {
         String sql = "INSERT INTO wf_task_actor (task_id, actor_id) VALUES (?, ?)";
         new Action(sql).create(taskId, actorId).execute(true, Long.class);
+    }
+
+    static void deleteTaskActor(Long taskId, Long actorId) {
+        String sql = "DELETE FROM wf_task_actor WHERE task_id = ? AND actor_id = ?";
+        new Action(sql).update(taskId, actorId).execute();
     }
 
     /**

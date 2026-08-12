@@ -1,6 +1,8 @@
 package com.ajaxjs.workflow.model.node;
 
 import com.ajaxjs.util.reflect.Clazz;
+import com.ajaxjs.util.reflect.NewInstance;
+import com.ajaxjs.util.ObjectHelper;
 import com.ajaxjs.workflow.common.WfException;
 import com.ajaxjs.workflow.model.Execution;
 import com.ajaxjs.workflow.model.TransitionModel;
@@ -10,7 +12,6 @@ import de.odysseus.el.util.SimpleContext;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.StringUtils;
 
 import javax.el.ExpressionFactory;
 import java.util.Map;
@@ -85,7 +86,7 @@ public class DecisionModel extends NodeModel {
         String next;
 
         // 判断并决定下一个步骤的名称
-        if (StringUtils.hasText(expr))
+        if (ObjectHelper.hasText(expr))
             next = eval(String.class, expr, exec.getArgs());
         else if (decide != null)
             next = decide.decide(exec);
@@ -100,10 +101,10 @@ public class DecisionModel extends NodeModel {
 
         // 遍历输出转换，寻找与决定结果匹配的步骤并执行
         for (TransitionModel tm : getOutputs()) {
-            if (!StringUtils.hasText(next)) {  // 如果没有指定名称，尝试根据条件表达式决定是否执行
+            if (!ObjectHelper.hasText(next)) {  // 如果没有指定名称，尝试根据条件表达式决定是否执行
                 String expr = tm.getExpr();
 
-                if (StringUtils.hasText(expr) && eval(Boolean.class, expr, exec.getArgs())) {
+                if (ObjectHelper.hasText(expr) && eval(Boolean.class, expr, exec.getArgs())) {
                     tm.setEnabled(true);
                     tm.execute(exec);
                     isFound = true;
@@ -127,7 +128,7 @@ public class DecisionModel extends NodeModel {
     public void setHandleClass(String handleClass) {
         this.handleClass = handleClass;
 
-        if (StringUtils.hasText(handleClass))
-            decide = (DecisionHandler) Clazz.newInstance(handleClass);
+        if (ObjectHelper.hasText(handleClass))
+            decide = (DecisionHandler) new NewInstance<>(handleClass).newInstance();
     }
 }

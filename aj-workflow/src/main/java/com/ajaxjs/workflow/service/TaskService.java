@@ -2,6 +2,7 @@ package com.ajaxjs.workflow.service;
 
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.JsonUtil;
+import com.ajaxjs.util.ObjectHelper;
 import com.ajaxjs.workflow.common.WfConstant;
 import com.ajaxjs.workflow.common.WfData;
 import com.ajaxjs.workflow.common.WfException;
@@ -20,8 +21,6 @@ import com.ajaxjs.workflow.model.po.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -70,7 +69,7 @@ public class TaskService implements WfConstant {
      */
     public Task complete(Long taskId, Long operator, Map<String, Object> args) {
         Task task = WfData.findTask(taskId);
-        task.setVariable(JsonUtil.toJson(args));
+        task.setVariable(JsonUtil.toJson(mergeVariables(task.getVariable(), args)));
 
 //		if (!isAllowed(task, operator))
 //			throw new WorkflowException("当前参与者[" + operator + "]不允许执行任务[taskId=" + taskId + "]");
@@ -141,7 +140,7 @@ public class TaskService implements WfConstant {
         List<Task> tasks = history.isPerformAny() ? WfData.findTasksByParentTaskId(history.getId())
                 : WfData.findNextActiveTasks(history.getOrderId(), history.getName(), history.getParentId());
 
-        if (ObjectUtils.isEmpty(tasks))
+        if (ObjectHelper.isEmpty(tasks))
             throw new WfException("后续活动任务已完成或不存在，无法撤回.");
 
         for (Task task : tasks)
@@ -255,7 +254,7 @@ public class TaskService implements WfConstant {
 
         List<TaskActor> actors = WfData.findTaskActorsByTaskId(task.getId());
 
-        if (ObjectUtils.isEmpty(actors))
+        if (ObjectHelper.isEmpty(actors))
             return true;
 
         return operator != null && operator != 0 && getTaskAccessStrategy().apply(operator, actors);
@@ -302,8 +301,9 @@ public class TaskService implements WfConstant {
      * 创建 task 对象
      */
     private static Task saveTask(Task task, Long... actors) {
-        task.setPerformType(PerformType.ANY);
+        task.setId(null);
         Long newlyId = new Action(task).create().execute(true, Long.class).getNewlyId();
+        task.setId(newlyId);
         assignTask(newlyId, actors);
         task.setActorIds(actors);
 
@@ -318,7 +318,7 @@ public class TaskService implements WfConstant {
      * @return 任务列表
      */
     public static List<Task> createTaskByModel(TaskModel taskModel, Execution exec) {
-        // Date remindDate = DateHelper.processTime(args, taskModel.getReminderTime());
+        // Reminder expressions require workflow-specific evaluation before DateTools conversion.
         Long[] actors = getActors(taskModel, exec);
 
         // 根据模型、执行对象、任务类型构建基本的 task 对象
@@ -327,6 +327,7 @@ public class TaskService implements WfConstant {
         task.setName(taskModel.getName());
         task.setDisplayName(taskModel.getDisplayName());
         task.setTaskType(taskModel.isMajor() ? TaskType.MAJOR : TaskType.AIDANT);
+        task.setPerformType(taskModel.isPerformAll() ? PerformType.ALL : PerformType.ANY);
         task.setModel(taskModel);
         task.setExpireDate(taskModel.getExpireTime());
 
@@ -340,7 +341,7 @@ public class TaskService implements WfConstant {
         String form = taskModel.getForm();
         String formArgs = (String) args.get(form);
 
-        if (StringUtils.hasText(formArgs))
+        if (ObjectHelper.hasText(formArgs))
             form = formArgs;
 
         task.setActionUrl(form);
@@ -354,6 +355,8 @@ public class TaskService implements WfConstant {
             task.setRemindDate(remindDate);
             tasks.add(task);
         } else if (taskModel.isPerformAll()) {
+            if (actors == null || actors.length == 0)
+                throw new WfException("ALL 会签任务至少需要一个参与者");
             // 任务执行方式为参与者中每个都要执行完才可驱动流程继续流转，该方法根据参与者个数产生对应的 task 数量
             for (Long actor : actors) {
                 Task singleTask;
@@ -376,7 +379,7 @@ public class TaskService implements WfConstant {
     private static Map<String, Object> getArgs(Execution exec, Long[] actors) {
         Args args = exec.getArgs();
         args = Args.getEmpty(args);
-        args.put(Task.KEY_ACTOR, WfUtils.join(actors));
+        args.put(Task.KEY_ACTOR, actors == null || actors.length == 0 ? "" : WfUtils.join(actors));
 
         return args;
     }
@@ -388,7 +391,7 @@ public class TaskService implements WfConstant {
      * @param actorIds 参与者 id 集合
      */
     public static void assignTask(Long taskId, Long... actorIds) {
-        if (ObjectUtils.isEmpty(actorIds))
+        if (ObjectHelper.isEmpty(actorIds))
             return;
 
         for (Long actorId : actorIds) {
@@ -415,7 +418,7 @@ public class TaskService implements WfConstant {
         Map<String, Object> args = exec.getArgs();
         Object actors = assignee;
 
-        if (StringUtils.hasText(assignee) && args != null && args.containsKey(assignee)) {
+        if (ObjectHelper.hasText(assignee) && args != null && args.containsKey(assignee)) {
             actors = args.get(assignee);
         } else if (model.getAssignment() != null) {
             BiFunction<TaskModel, Execution, Object> handler = model.getAssignment();
@@ -489,23 +492,27 @@ public class TaskService implements WfConstant {
         if (actors == null || actors.length == 0)
             return;
 
+        for (Long actor : actors)
+            if (actor != null)
+                WfData.deleteTaskActor(taskId, actor);
+
         if (task.getTaskType() == TaskType.MAJOR) {
             // removeTaskActor(task.getId(), actors);
             Map<String, Object> taskData = JsonUtil.json2map(task.getVariable());
             String actorStr = (String) taskData.get(Task.KEY_ACTOR);
 
-            if (StringUtils.hasText(actorStr)) {
+            if (ObjectHelper.hasText(actorStr)) {
                 String[] actorArray = actorStr.split(",");
                 StringBuilder newActor = new StringBuilder(actorStr.length());
                 boolean isMatch;
 
                 for (String actor : actorArray) {
                     isMatch = false;
-                    if (!StringUtils.hasText(actor))
+                    if (!ObjectHelper.hasText(actor))
                         continue;
 
                     for (Long removeActor : actors) {
-                        if (actor.equals(removeActor)) {
+                        if (removeActor != null && actor.equals(removeActor.toString())) {
                             isMatch = true;
                             break;
                         }
@@ -517,7 +524,8 @@ public class TaskService implements WfConstant {
                     newActor.append(actor).append(",");
                 }
 
-                newActor.deleteCharAt(newActor.length() - 1);
+                if (newActor.length() > 0)
+                    newActor.deleteCharAt(newActor.length() - 1);
                 taskData.put(Task.KEY_ACTOR, newActor.toString());
                 task.setVariable(JsonUtil.toJson(taskData));
                 new Action(task).update();
@@ -556,10 +564,12 @@ public class TaskService implements WfConstant {
             Map<String, Object> data = JsonUtil.json2map(task.getVariable());
 
             if (data == null)
-                data = Collections.emptyMap();
+                data = new HashMap<>();
 
             String oldActor = (String) data.get(Task.KEY_ACTOR);
-            data.put(Task.KEY_ACTOR, oldActor + "," + WfUtils.join(actors));
+            String addedActors = actors == null || actors.length == 0 ? "" : WfUtils.join(actors);
+            data.put(Task.KEY_ACTOR, ObjectHelper.hasText(oldActor) && ObjectHelper.hasText(addedActors)
+                    ? oldActor + "," + addedActors : (ObjectHelper.hasText(oldActor) ? oldActor : addedActors));
             task.setVariable(JsonUtil.toJson(data));
 
             if (!new Action(task).update().withId().isOk())
@@ -568,17 +578,20 @@ public class TaskService implements WfConstant {
             try {
                 for (Long actor : actors) {
                     Task newTask = (Task) task.clone();
+                    newTask.setId(null);
                     newTask.setOperator(actor);
 
                     Map<String, Object> taskData = JsonUtil.json2map(task.getVariable());
                     if (taskData == null)
-                        taskData = Collections.emptyMap();
+                        taskData = new HashMap<>();
 
                     taskData.put(Task.KEY_ACTOR, actor);
-                    task.setVariable(JsonUtil.toJson(taskData));
+                    newTask.setVariable(JsonUtil.toJson(taskData));
 
-                    if (!new Action(newTask).create().execute(true).isOk())
+                    com.ajaxjs.sqlman.model.CreateResult<Long> created = new Action(newTask).create().execute(true, Long.class);
+                    if (!created.isOk())
                         log.info("创建任务失败");
+                    newTask.setId(created.getNewlyId());
 
                     assignTask(newTask.getId(), actor);
                 }
@@ -632,6 +645,7 @@ public class TaskService implements WfConstant {
 
         try {
             Task newTask = (Task) task.clone();
+            newTask.setId(null);
             newTask.setParentId(taskId);
             newTask.setTaskType(taskType);
 
@@ -654,7 +668,7 @@ public class TaskService implements WfConstant {
     public Args flowData(Long orderId, String taskName) {
         Args args = new Args();
 
-        if (orderId != null && orderId != 0 && StringUtils.hasText(taskName)) {
+        if (orderId != null && orderId != 0 && ObjectHelper.hasText(taskName)) {
             List<TaskHistory> histTasks = WfData.findHistoryTasksByOrderIdAndTaskName(orderId, taskName);
             List<Args> vars = new ArrayList<>();
 
@@ -673,5 +687,25 @@ public class TaskService implements WfConstant {
         }
 
         return args;
+    }
+
+    /**
+     * Merges submitted task variables over variables already persisted as JSON.
+     * The returned map is always mutable and never aliases the submitted map.
+     *
+     * @param persistedJson persisted variables, or {@code null}
+     * @param submitted variables supplied for the current operation, or {@code null}
+     * @return mutable merged variables
+     */
+    public static Map<String, Object> mergeVariables(String persistedJson, Map<String, Object> submitted) {
+        Map<String, Object> merged = ObjectHelper.hasText(persistedJson)
+                ? JsonUtil.json2map(persistedJson) : null;
+        if (merged == null)
+            merged = new HashMap<>();
+        else
+            merged = new HashMap<>(merged);
+        if (submitted != null)
+            merged.putAll(submitted);
+        return merged;
     }
 }

@@ -2,9 +2,9 @@ package com.ajaxjs.workflow.service.parser;
 
 import com.ajaxjs.workflow.model.node.NodeModel;
 import com.ajaxjs.workflow.model.node.work.SubProcessModel;
+import com.ajaxjs.util.ObjectHelper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
 /**
@@ -46,6 +46,6 @@ public class SubprocessParser extends AbstractNodeParser {
 
         // 获取表单信息，并设置到model中，如果表单信息为空，则使用默认的subProcessUrl
         String form = element.getAttribute(ATTR_FORM);
-        model.setForm(StringUtils.hasText(form) ? form : subProcessUrl);
+        model.setForm(ObjectHelper.hasText(form) ? form : subProcessUrl);
     }
 }

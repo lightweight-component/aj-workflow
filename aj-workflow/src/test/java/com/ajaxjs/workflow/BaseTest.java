@@ -1,7 +1,6 @@
 package com.ajaxjs.workflow;
 
 
-import com.ajaxjs.framework.database.DataBaseConnection;
 import com.ajaxjs.sqlman.JdbcConnection;
 import com.ajaxjs.util.io.Resources;
 import com.ajaxjs.workflow.common.WfConstant;
@@ -9,7 +8,6 @@ import com.ajaxjs.workflow.service.ProcessService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 /**
@@ -30,7 +28,6 @@ public abstract class BaseTest implements WfConstant {
 //    @Before
     public void initDb() {
 //        processService.setCacheManager(new MemoryCacheManager());
-        DataBaseConnection.initDb();
     }
 
 //    @After

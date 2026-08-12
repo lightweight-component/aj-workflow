@@ -1,6 +1,7 @@
 package com.ajaxjs.workflow.model.node;
 
 import com.ajaxjs.workflow.WorkflowEngine;
+import com.ajaxjs.util.ObjectHelper;
 import com.ajaxjs.workflow.common.WfConstant.TaskType;
 import com.ajaxjs.workflow.common.WfData;
 import com.ajaxjs.workflow.common.WfException;
@@ -12,7 +13,6 @@ import com.ajaxjs.workflow.model.po.Order;
 import com.ajaxjs.workflow.model.po.ProcessPO;
 import com.ajaxjs.workflow.model.po.Task;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.ObjectUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -42,7 +42,7 @@ public class EndModel extends NodeModel {
             Order order = exec1.getOrder();
             List<Task> tasks = WfData.findTasksByOrderId(order.getId());// 查找当前活动的任务
 
-            if (!ObjectUtils.isEmpty(tasks)) // 检查并处理未完成的主办任务
+            if (!ObjectHelper.isEmpty(tasks)) // 检查并处理未完成的主办任务
                 for (Task task : tasks) {
                     if (task.getTaskType() == TaskType.MAJOR)
                         throw new WfException("存在未完成的主办任务，请确认！？");

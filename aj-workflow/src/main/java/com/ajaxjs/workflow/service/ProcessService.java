@@ -2,6 +2,7 @@ package com.ajaxjs.workflow.service;
 
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.cache.Cache;
+import com.ajaxjs.util.ObjectHelper;
 import com.ajaxjs.util.cache.CacheManager;
 import com.ajaxjs.util.cache.CacheManagerAware;
 import com.ajaxjs.util.cache.MemoryCacheManager;
@@ -11,7 +12,6 @@ import com.ajaxjs.workflow.model.ProcessModel;
 import com.ajaxjs.workflow.model.po.ProcessPO;
 import com.ajaxjs.workflow.service.parser.ProcessModelParser;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +52,7 @@ public class ProcessService implements CacheManagerAware, WfConstant {
      * @param creator    创建人
      * @return 新建流程 id
      */
-    public long deploy(String processXml, Long creator) {
+    public synchronized long deploy(String processXml, Long creator) {
         ProcessModel model = ProcessModelParser.parse(processXml);
         ProcessPO bean = new ProcessPO();
 
@@ -115,7 +115,7 @@ public class ProcessService implements CacheManagerAware, WfConstant {
     public ProcessPO findByVersion(String name, Integer version) {
         List<ProcessPO> list = WfData.findProcess(name, version);
 
-        if (ObjectUtils.isEmpty(list))
+        if (ObjectHelper.isEmpty(list))
             return null;
         else {
             ProcessPO p = list.get(0);

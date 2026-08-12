@@ -1,6 +1,6 @@
 package com.ajaxjs.workflow.model;
 
-import com.ajaxjs.spring.DiContextUtil;
+import com.ajaxjs.workflow.common.SpringContext;
 import com.ajaxjs.workflow.model.node.NodeModel;
 import com.ajaxjs.workflow.model.node.work.SubProcessModel;
 import com.ajaxjs.workflow.model.node.work.TaskModel;
@@ -80,7 +80,7 @@ public class TransitionModel extends BaseWfModel {
                 exec1.addTasks(tasks);
 
                 // 从服务上下文中查找任务拦截器列表，依次对 task 集合进行拦截处理
-                Map<String, WorkflowInterceptor> interceptors = DiContextUtil.findByInterface(WorkflowInterceptor.class);
+                Map<String, WorkflowInterceptor> interceptors = SpringContext.getBeans(WorkflowInterceptor.class);
 
                 try {
                     for (String id : interceptors.keySet())

@@ -14,7 +14,8 @@ CREATE TABLE IF NOT EXISTS `wf_process` (
   `updater_id` INT(11) NULL DEFAULT NULL COMMENT '修改人 id',
   `update_date` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改日期',
   PRIMARY KEY (`id`),
-  UNIQUE INDEX `id_UNIQUE` (`id`) USING BTREE
+  UNIQUE INDEX `id_UNIQUE` (`id`) USING BTREE,
+  UNIQUE INDEX `uk_wf_process_name_version` (`name`, `version`) USING BTREE
 ) COMMENT = '流程定义';
 
 CREATE TABLE IF NOT EXISTS `wf_order` (

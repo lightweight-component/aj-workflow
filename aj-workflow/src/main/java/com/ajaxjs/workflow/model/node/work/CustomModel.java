@@ -1,8 +1,9 @@
 package com.ajaxjs.workflow.model.node.work;
 
 import com.ajaxjs.sqlman.Action;
-import com.ajaxjs.util.reflect.Clazz;
 import com.ajaxjs.util.reflect.Methods;
+import com.ajaxjs.util.reflect.NewInstance;
+import com.ajaxjs.util.ObjectHelper;
 import com.ajaxjs.workflow.common.WfConstant;
 import com.ajaxjs.workflow.common.WfConstant.TaskType;
 import com.ajaxjs.workflow.common.WfException;
@@ -12,7 +13,6 @@ import com.ajaxjs.workflow.model.po.TaskHistory;
 import com.ajaxjs.workflow.service.handler.IHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Method;
 import java.util.Date;
@@ -54,7 +54,7 @@ public class CustomModel extends WorkModel {
     @Override
     public void exec(Execution exec) {
         if (invokeObject == null)
-            invokeObject = Clazz.newInstance(clazz);
+            invokeObject = new NewInstance<>(clazz).newInstance();
 
         if (invokeObject == null)
             throw new WfException("自定义模型[class=" + clazz + "]实例化对象失败");
@@ -69,9 +69,16 @@ public class CustomModel extends WorkModel {
                 throw new WfException("自定义模型[class=" + clazz + "]无法找到方法名称:" + methodName);
 
             Object[] objects = getArgs(exec.getArgs(), args);
-            Object returnValue = Methods.executeMethod(invokeObject, method, objects);
+            Object returnValue;
+            try {
+                returnValue = Methods.execute(invokeObject, method, objects);
+            } catch (RuntimeException | Error e) {
+                throw e;
+            } catch (Throwable e) {
+                throw new WfException(e);
+            }
 
-            if (StringUtils.hasText(var))
+            if (ObjectHelper.hasText(var))
                 exec.getArgs().put(var, returnValue);
         }
 
@@ -84,7 +91,7 @@ public class CustomModel extends WorkModel {
         task.setStat(WfConstant.STATE_FINISH);
         task.setTaskType(TaskType.RECORD);
         task.setParentId(exec.getTask() == null ? 0 : exec.getTask().getId());
-//        task.setVariable(JsonHelper.toJson(exec.getArgs()));
+//        task.setVariable(JsonUtil.toJson(exec.getArgs()));
 
         new Action(task).create().execute(true);
         runOutTransition(exec);
@@ -100,7 +107,7 @@ public class CustomModel extends WorkModel {
     private Object[] getArgs(Map<String, Object> execArgs, String args) {
         Object[] objects = null;
 
-        if (StringUtils.hasText(args)) {
+        if (ObjectHelper.hasText(args)) {
             String[] argArray = args.split(",");
             objects = new Object[argArray.length];
 

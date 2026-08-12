@@ -1,6 +1,8 @@
 package com.ajaxjs.workflow.model.node.work;
 
 import com.ajaxjs.util.reflect.Clazz;
+import com.ajaxjs.util.reflect.NewInstance;
+import com.ajaxjs.util.ObjectHelper;
 import com.ajaxjs.workflow.model.Execution;
 import com.ajaxjs.workflow.model.FieldModel;
 import com.ajaxjs.workflow.model.TransitionModel;
@@ -9,7 +11,6 @@ import com.ajaxjs.workflow.service.scheduling.JobCallback;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -139,11 +140,11 @@ public class TaskModel extends WorkModel {
     }
 
     public void setTaskType(String taskType) {
-        this.taskType = !StringUtils.hasText(taskType) ? TASK_TYPE_MAJOR : taskType;
+        this.taskType = !ObjectHelper.hasText(taskType) ? TASK_TYPE_MAJOR : taskType;
     }
 
     public void setPerformType(String performType) {
-        this.performType = !StringUtils.hasText(performType) ? PERFORM_TYPE_ANY : performType;
+        this.performType = !ObjectHelper.hasText(performType) ? PERFORM_TYPE_ANY : performType;
     }
 
     /**
@@ -152,9 +153,9 @@ public class TaskModel extends WorkModel {
     private BiFunction<TaskModel, Execution, Object> assignment;
 
     public void setCallback(String callbackStr) {
-        if (StringUtils.hasText(callbackStr)) {
+        if (ObjectHelper.hasText(callbackStr)) {
             this.callback = callbackStr;
-            callbackObject = (JobCallback) Clazz.newInstance(callbackStr);
+            callbackObject = (JobCallback) new NewInstance<>(callbackStr).newInstance();
             Objects.requireNonNull(callbackObject, "回调处理类实例化失败");
         }
     }

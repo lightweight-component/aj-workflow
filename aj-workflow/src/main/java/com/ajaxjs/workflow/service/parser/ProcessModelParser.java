@@ -1,12 +1,12 @@
 package com.ajaxjs.workflow.service.parser;
 
-import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.util.XmlHelper;
 import com.ajaxjs.util.date.DateTools;
 import com.ajaxjs.util.reflect.Clazz;
 import com.ajaxjs.workflow.model.ProcessModel;
 import com.ajaxjs.workflow.model.TransitionModel;
 import com.ajaxjs.workflow.model.node.NodeModel;
+import com.ajaxjs.workflow.common.SpringContext;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -71,7 +71,7 @@ public class ProcessModelParser {
 
         String packageName = AbstractNodeParser.class.getPackage().getName() + ".";
         Class<?> clz = Clazz.getClassByName(packageName + str);
-        Object p = DiContextUtil.getBean(clz);
+        Object p = SpringContext.getBean(clz);
         Objects.requireNonNull(p, "不存在这类型的解释器 " + str);
 
         AbstractNodeParser nodeParser = (AbstractNodeParser) p;

@@ -2,6 +2,7 @@ package com.ajaxjs.workflow.service;
 
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.JsonUtil;
+import com.ajaxjs.util.ObjectHelper;
 import com.ajaxjs.workflow.common.WfConstant;
 import com.ajaxjs.workflow.common.WfData;
 import com.ajaxjs.workflow.common.WfUtils;
@@ -10,10 +11,9 @@ import com.ajaxjs.workflow.model.po.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ObjectUtils;
 
-import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -62,7 +62,7 @@ public class OrderService implements WfConstant {
 
             if (model.getExpireDate() != null) // 过期时间
                 order.setExpireDate(model.getExpireDate());
-//				String expireTime = DateHelper.parseTime(args.get(model.getExpireTime()));
+//                Date expireTime = DateTools.object2Date(args.get(model.getExpireTime()));
 //				order.setExpireTime(expireTime);
 
             if (args.get("ajFlow.orderNo") != null) // 生成编号
@@ -88,7 +88,8 @@ public class OrderService implements WfConstant {
         log.info("保存历史流程实例 {}", order.getName());
         OrderHistory history = new OrderHistory(order);// 复制一份
         history.setStat(WfConstant.STATE_ACTIVE);
-        new Action(history).create();
+        if (!new Action(history).create().execute(false).isOk())
+            throw new IllegalStateException("创建历史流程实例失败，orderId=" + id);
 
         return id;
     }
@@ -111,7 +112,7 @@ public class OrderService implements WfConstant {
 
         Map<String, Object> data = JsonUtil.json2map(order.getVariable());
         if (data == null)
-            data = Collections.emptyMap();
+            data = new HashMap<>();
 
         data.putAll(args);
 
@@ -150,6 +151,9 @@ public class OrderService implements WfConstant {
     public void complete(Long orderId) {
         log.info("结束 {} 流程", orderId);
         updateHistoryOrder(orderId, WfConstant.STATE_FINISH);
+        Order active = WfData.findOrder(orderId);
+        if (active != null)
+            new Action(active).update().delete();
     }
 
     /**
@@ -165,6 +169,9 @@ public class OrderService implements WfConstant {
             taskService.complete(task.getId(), operator, null);
 
         updateHistoryOrder(orderId, WfConstant.STATE_TERMINATION);
+        Order active = WfData.findOrder(orderId);
+        if (active != null)
+            new Action(active).update().delete();
     }
 
     /**
@@ -185,7 +192,7 @@ public class OrderService implements WfConstant {
 
         List<TaskHistory> histTasks = WfData.findHistoryTasksByOrderId(orderId);
 
-        if (!ObjectUtils.isEmpty(histTasks)) {
+        if (!ObjectHelper.isEmpty(histTasks)) {
             TaskHistory histTask = histTasks.get(0);
             taskService.resume(histTask.getId(), histTask.getOperator());
         }

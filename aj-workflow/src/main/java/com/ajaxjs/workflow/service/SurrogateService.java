@@ -18,7 +18,7 @@ public class SurrogateService implements WfConstant {
      * @return String 代理人
      */
     public Long getSurrogate(Long operator, String processName) {
-//		QueryFilter filter = new QueryFilter().setOperator(operator).setOperateTime(DateHelper.getTime());
+//        QueryFilter filter = new QueryFilter().setOperator(operator).setOperateTime(new Date());
 //
 //		if (!CommonUtil.isEmptyString(processName))
 //			filter.setName(processName);

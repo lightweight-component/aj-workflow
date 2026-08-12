@@ -1,6 +1,8 @@
 package com.ajaxjs.workflow.model.node;
 
 import com.ajaxjs.util.reflect.Clazz;
+import com.ajaxjs.util.reflect.NewInstance;
+import com.ajaxjs.util.ObjectHelper;
 import com.ajaxjs.workflow.common.WfException;
 import com.ajaxjs.workflow.model.BaseWfModel;
 import com.ajaxjs.workflow.model.Execution;
@@ -9,7 +11,6 @@ import com.ajaxjs.workflow.service.interceptor.WorkflowInterceptor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -157,13 +158,14 @@ public abstract class NodeModel extends BaseWfModel {
      * @param fn           拦截器
      */
     private static void addInterceptors(String interceptors, Consumer<WorkflowInterceptor> fn) {
-        if (!StringUtils.hasText(interceptors))
+        if (!ObjectHelper.hasText(interceptors))
             return;
 
         String[] arr = interceptors.split(",");
 
         for (String interceptor : arr) {
-            WorkflowInterceptor instance = Clazz.newInstance(WorkflowInterceptor.class, interceptor);
+            Class<WorkflowInterceptor> type = Clazz.getClassByName(interceptor, WorkflowInterceptor.class);
+            WorkflowInterceptor instance = new NewInstance<>(type).newInstance();
             fn.accept(instance);
         }
     }

@@ -1,6 +1,7 @@
 package com.ajaxjs.workflow;
 
 import com.ajaxjs.util.JsonUtil;
+import com.ajaxjs.util.ObjectHelper;
 import com.ajaxjs.workflow.common.WfConstant;
 import com.ajaxjs.workflow.common.WfConstant.TaskType;
 import com.ajaxjs.workflow.common.WfData;
@@ -21,8 +22,6 @@ import com.ajaxjs.workflow.service.TaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -70,7 +69,7 @@ public class WorkflowEngine {
         List<Task> tasks = WfData.findTasksByOrderId(order.getId());
         List<Task> newTasks = new ArrayList<>();
 
-        if (!CollectionUtils.isEmpty(tasks)) {
+        if (!ObjectHelper.isEmpty(tasks)) {
             Task task = tasks.get(0);
             newTasks.addAll(executeTask(task.getId(), operator, args));
         }
@@ -129,8 +128,8 @@ public class WorkflowEngine {
      */
     private Order startInstance(ProcessPO process, Long operator, Args args) {
         // 检查流程状态
+        Objects.requireNonNull(process, "指定的流程定义不存在");
         String idOrName = process.getName();
-        Objects.requireNonNull(process, "指定的流程定义[id/name=" + idOrName + "]不存在");
 
         if (process.getStat() != null && process.getStat().equals(WfConstant.STATE_FINISH))
             throw new IllegalArgumentException("指定的流程定义[id/name=" + idOrName + ",version=" + process.getVersion() + "]为非活动状态");
@@ -224,7 +223,7 @@ public class WorkflowEngine {
         ProcessModel model = execution.getProcess().getModel();
         Objects.requireNonNull(model, "当前任务未找到流程定义模型");
 
-        if (!StringUtils.hasText(nodeName)) {
+        if (!ObjectHelper.hasText(nodeName)) {
             Task newTask = taskService.rejectTask(model, execution.getTask());
             execution.addTask(newTask);
         } else {
@@ -301,7 +300,7 @@ public class WorkflowEngine {
         Order order = WfData.findOrder(orderId);
         Objects.requireNonNull(order, "指定的流程实例[id=" + orderId + "]已完成或不存在");
         order.setUpdater(operator);
-        // order.setLastUpdateTime(DateHelper.getTime());
+        // order.setLastUpdateTime(new Date());
 
         ProcessPO process = processService.findById(order.getProcessId());
         Execution exec = new Execution(this, process, order, args);

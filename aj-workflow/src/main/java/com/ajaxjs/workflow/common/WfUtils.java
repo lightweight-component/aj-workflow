@@ -36,6 +36,9 @@ public class WfUtils {
      * @return 连接后的字符串结果
      */
     public static String join(Object[] arr) {
+        if (arr == null || arr.length == 0)
+            return "";
+
         StringBuilder sb = new StringBuilder();
         for (Object o : arr)
             sb.append(o).append(",");

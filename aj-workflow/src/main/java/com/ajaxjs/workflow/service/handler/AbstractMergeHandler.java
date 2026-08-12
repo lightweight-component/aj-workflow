@@ -8,7 +8,7 @@ import com.ajaxjs.workflow.model.node.work.TaskModel;
 import com.ajaxjs.workflow.model.po.Order;
 import com.ajaxjs.workflow.model.po.Task;
 import com.ajaxjs.workflow.service.TaskService;
-import org.springframework.util.CollectionUtils;
+import com.ajaxjs.util.ObjectHelper;
 
 import java.util.List;
 
@@ -35,7 +35,7 @@ public abstract class AbstractMergeHandler implements IHandler {
         if (model.containsNodeNames(SubProcessModel.class, activeNodes)) {
             List<Order> orders = WfData.findByIdAndExcludedIds(orderId, exec.getChildOrderId());// 根据订单ID和排除的子订单ID查询未完成的子订单
 
-            if (CollectionUtils.isEmpty(orders))    // 如果没有未完成的子订单，则表示子流程可以被合并
+            if (ObjectHelper.isEmpty(orders))    // 如果没有未完成的子订单，则表示子流程可以被合并
                 isSubProcessMerged = true;
         } else {
             // 如果当前流程实例不包含子流程，则直接设置子流程为可合并状态
@@ -51,7 +51,7 @@ public abstract class AbstractMergeHandler implements IHandler {
             List<Task> tasks = WfData.findByOrderIdAndExcludedIds(orderId, exec.getTask().getId(), activeNodes);
 
             // 如果没有未完成的任务，则表示任务可以被合并
-            if (CollectionUtils.isEmpty(tasks))
+            if (ObjectHelper.isEmpty(tasks))
                 isTaskMerged = true;
         }
 
