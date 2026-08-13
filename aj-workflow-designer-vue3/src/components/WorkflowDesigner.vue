@@ -3,7 +3,8 @@
     <aside class="toolbox">
       <h1>Workflow</h1>
       <p class="muted">Vue 3 Designer</p>
-      <button type="button" :disabled="readonly" :class="{ active: connectMode }" @click="toggleConnect">{{ connectMode ? (connectFrom ? '请选择终点' : '请选择起点') : '创建连线' }}</button>
+      <button type="button" :disabled="readonly" :class="{ active: connectMode }" @click="toggleConnect">{{ connectMode
+        ? (connectFrom ? '请选择终点' : '请选择起点') : '创建连线' }}</button>
       <h2>组件</h2>
       <button v-for="item in nodeTypes" :key="item.type" type="button" :disabled="readonly" @click="addNode(item.type)">
         <span :class="['node-icon', item.type]" />{{ item.label }}
@@ -25,8 +26,10 @@
           <template v-if="selectedNodeRefs.length > 1">
             <button type="button" :disabled="readonly" @click="alignSelection('left')">左对齐</button>
             <button type="button" :disabled="readonly" @click="alignSelection('top')">顶对齐</button>
-            <button type="button" :disabled="readonly || selectedNodeRefs.length < 3" @click="distributeSelection('horizontal')">水平分布</button>
-            <button type="button" :disabled="readonly || selectedNodeRefs.length < 3" @click="distributeSelection('vertical')">垂直分布</button>
+            <button type="button" :disabled="readonly || selectedNodeRefs.length < 3"
+              @click="distributeSelection('horizontal')">水平分布</button>
+            <button type="button" :disabled="readonly || selectedNodeRefs.length < 3"
+              @click="distributeSelection('vertical')">垂直分布</button>
           </template>
         </div>
         <nav aria-label="编辑模式">
@@ -45,10 +48,12 @@
         <span>滚轮缩放，Alt+拖动或中键拖动画布；双击连线增加拐点，双击拐点删除</span>
       </div>
 
-      <div v-show="mode === 'design'" ref="canvasHost" class="canvas" @pointerdown="activateDesigner" @click.self="select(null)" />
+      <div v-show="mode === 'design'" ref="canvasHost" class="canvas" @pointerdown="activateDesigner"
+        @click.self="select(null)" />
       <section v-if="mode === 'json'" class="json-editor">
         <textarea v-model="jsonCode" :readonly="readonly" spellcheck="false" aria-label="流程 JSON" />
-        <div class="json-actions"><span v-if="jsonError" class="error">{{ jsonError }}</span><button type="button" :disabled="readonly" @click="applyJson">应用 JSON</button></div>
+        <div class="json-actions"><span v-if="jsonError" class="error">{{ jsonError }}</span><button type="button"
+            :disabled="readonly" @click="applyJson">应用 JSON</button></div>
       </section>
     </section>
 
@@ -57,9 +62,13 @@
       <p>基于 Vue 3、TypeScript 与 Raphael 的轻量级流程设计器。</p>
       <p>SVG 图形采用命令式适配器管理，不进入 Vue 响应式系统。</p>
     </SimpleModal>
-    <SimpleModal :open="validationOpen" :title="validationIssues.length ? `发现 ${validationIssues.length} 个问题` : '流程校验通过'" @close="validationOpen = false">
+    <SimpleModal :open="validationOpen"
+      :title="validationIssues.length ? `发现 ${validationIssues.length} 个问题` : '流程校验通过'" @close="validationOpen = false">
       <p v-if="!validationIssues.length" class="validation-success">流程结构和属性校验通过。</p>
-      <ol v-else class="validation-list"><li v-for="(issue, index) in validationIssues" :key="`${issue.code}-${index}`"><button type="button" @click="focusIssue(issue)">{{ issue.message }}</button></li></ol>
+      <ol v-else class="validation-list">
+        <li v-for="(issue, index) in validationIssues" :key="`${issue.code}-${index}`"><button type="button"
+            @click="focusIssue(issue)">{{ issue.message }}</button></li>
+      </ol>
     </SimpleModal>
   </main>
 </template>
@@ -80,6 +89,7 @@ const nodeTypes = [
   { type: "decision", label: "判断" }, { type: "fork", label: "分支" }, { type: "join", label: "合并" },
   { type: "custom", label: "自定义" }, { type: "subprocess", label: "子流程" }
 ];
+
 const canvasHost = ref<HTMLElement | null>(null);
 const designerRoot = ref<HTMLElement | null>(null);
 const initialModel = isRenderableWorkflow(props.modelValue) ? props.modelValue : SAMPLE_WORKFLOW;
@@ -180,61 +190,116 @@ const copySelection = () => {
   clipboard.value = { nodes, paths };
   pasteCount = 0;
 };
+
 const uniqueRef = (base: string, collection: Record<string, unknown>) => { let index = 1, value = `${base}_copy`; while (collection[value]) value = `${base}_copy${++index}`; return value; };
+
 const pasteSelection = () => {
-  if (readonly.value || !clipboard.value) return;
-  const before = cloneWorkflow(workflow.value), refs = Object.keys(clipboard.value.nodes), refMap: Record<string, string> = {}, pasted: string[] = [], offset = 30 * ++pasteCount;
+  if (readonly.value || !clipboard.value)
+    return;
+  const before: WorkflowDefinition = cloneWorkflow(workflow.value), refs: string[] = Object.keys(clipboard.value.nodes), refMap: Record<string, string> = {}, pasted: string[] = [], offset = 30 * ++pasteCount;
   refs.forEach(ref => {
-    const node = JSON.parse(JSON.stringify(clipboard.value!.nodes[ref]));
-    const nextRef = uniqueRef(ref, workflow.value.states); refMap[ref] = nextRef; pasted.push(nextRef);
-    node.attr.x += offset; node.attr.y += offset; node.props.name = { value: nextRef };
+    const node: any = JSON.parse(JSON.stringify(clipboard.value!.nodes[ref]));
+    const nextRef: string = uniqueRef(ref, workflow.value.states); 
+    refMap[ref] = nextRef; pasted.push(nextRef);
+    node.attr.x += offset; 
+    node.attr.y += offset; node.props.name = { value: nextRef };
     workflow.value.states[nextRef] = node;
   });
+
   Object.entries(clipboard.value.paths).forEach(([ref, source]) => {
     const nextRef = uniqueRef(ref, workflow.value.paths), path = JSON.parse(JSON.stringify(source));
     path.from = refMap[path.from]; path.to = refMap[path.to]; path.dots = path.dots.map((point: { x: number; y: number }) => ({ x: point.x + offset, y: point.y + offset })); path.props.name = { value: nextRef };
     workflow.value.paths[nextRef] = path;
   });
+
   record(before); render(); nextTick(() => canvas?.select(pasted.length > 1 ? { kind: "nodes", refs: pasted } : { kind: "node", ref: pasted[0] }));
 };
-const openJson = () => { jsonCode.value = JSON.stringify(workflow.value, null, 2); jsonError.value = ""; mode.value = "json"; };
+
+const openJson = () => {
+  jsonCode.value = JSON.stringify(workflow.value, null, 2);
+  jsonError.value = ""; mode.value = "json";
+};
+
 const applyJson = () => {
   try {
     const parsed: unknown = JSON.parse(jsonCode.value);
     validateWorkflow(parsed);
-    const before = cloneWorkflow(workflow.value);
+    const before: WorkflowDefinition = cloneWorkflow(workflow.value);
     workflow.value = cloneWorkflow(parsed);
     record(before);
     propertyBefore = cloneWorkflow(workflow.value);
     jsonError.value = "";
     mode.value = "design";
     nextTick(render);
-  } catch (error) { jsonError.value = error instanceof Error ? error.message : "JSON 无效"; }
+  } catch (error) {
+    jsonError.value = error instanceof Error ? error.message : "JSON 无效";
+  }
 };
+
 const runValidation = () => {
   validationIssues.value = inspectWorkflow(workflow.value);
   validationOpen.value = true;
 };
+
 const focusIssue = (issue: WorkflowValidationIssue) => {
-  if (!issue.target || issue.target === "process") { validationOpen.value = false; canvas?.fitToContent(); return; }
-  const kind = workflow.value.states[issue.target] ? "node" : workflow.value.paths[issue.target] ? "path" : null;
-  if (kind) { validationOpen.value = false; mode.value = "design"; nextTick(() => canvas?.focus({ kind, ref: issue.target! })); }
+  if (!issue.target || issue.target === "process") {
+    validationOpen.value = false;
+    canvas?.fitToContent();
+
+    return;
+  }
+
+  const kind: "node" | "path" | null = workflow.value.states[issue.target] ? "node" : workflow.value.paths[issue.target] ? "path" : null;
+
+  if (kind) {
+    validationOpen.value = false; mode.value = "design";
+    nextTick(() => canvas?.focus({ kind, ref: issue.target! }));
+  }
 };
+
 const downloadJson = () => {
   validationIssues.value = inspectWorkflow(workflow.value);
-  if (validationIssues.value.length) { validationOpen.value = true; return; }
-  const url = URL.createObjectURL(new Blob([JSON.stringify(workflow.value, null, 2)], { type: "application/json" }));
-  const link = document.createElement("a");
+
+  if (validationIssues.value.length) {
+    validationOpen.value = true;
+    return;
+  }
+
+  const url: string = URL.createObjectURL(new Blob([JSON.stringify(workflow.value, null, 2)], { type: "application/json" }));
+  const link: HTMLAnchorElement = document.createElement("a");
+
   link.href = url; link.download = `${workflow.value.props.name || "workflow"}.json`; link.click();
   URL.revokeObjectURL(url);
 };
-const record = (before: WorkflowDefinition) => { if (readonly.value || JSON.stringify(before) === JSON.stringify(workflow.value)) return; undoStack.value.push(before); if (undoStack.value.length > 100) undoStack.value.shift(); redoStack.value = []; emitChange(); };
+
+const record = (before: WorkflowDefinition) => {
+  if (readonly.value || JSON.stringify(before) === JSON.stringify(workflow.value))
+    return; undoStack.value.push(before);
+
+  if (undoStack.value.length > 100)
+    undoStack.value.shift(); redoStack.value = []; emitChange();
+};
 const beginCanvasEdit = () => { editBefore = cloneWorkflow(workflow.value); };
-const endCanvasEdit = () => { if (editBefore) record(editBefore); editBefore = null; propertyBefore = cloneWorkflow(workflow.value); };
+const endCanvasEdit = () => {
+  if (editBefore) record(editBefore);
+  editBefore = null;
+  propertyBefore = cloneWorkflow(workflow.value);
+};
 let propertyBefore = cloneWorkflow(workflow.value);
-const commitPropertyChange = () => { if (readonly.value) return; record(propertyBefore); propertyBefore = cloneWorkflow(workflow.value); refreshCanvas(); };
+const commitPropertyChange = () => {
+  if (readonly.value)
+    return; record(propertyBefore);
+  propertyBefore = cloneWorkflow(workflow.value);
+  refreshCanvas();
+};
 const replaceWorkflow = (value: WorkflowDefinition, options: { markClean?: boolean; emit?: boolean } = {}) => {
-  if (!isRenderableWorkflow(value)) { emit("load-error", inspectWorkflow(value)); return false; }
+
+  if (!isRenderableWorkflow(value)) {
+    emit("load-error", inspectWorkflow(value));
+
+    return false;
+  }
+
   workflow.value = cloneWorkflow(value);
   undoStack.value = [];
   redoStack.value = [];
