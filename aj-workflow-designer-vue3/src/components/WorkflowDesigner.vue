@@ -118,7 +118,16 @@
 </template>
 
 <script setup lang="ts">
-import { type ComputedRef, computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import {
+  type ComputedRef,
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  type Ref,
+  ref,
+  watch,
+} from "vue";
 import { type Selection, WorkflowCanvas } from "@/canvas/workflow-canvas";
 import PropertyEditor from "@/components/PropertyEditor.vue";
 import SimpleModal from "@/components/SimpleModal.vue";
@@ -147,7 +156,12 @@ const emit = defineEmits<{
   "load-error": [issues: WorkflowValidationIssue[]];
 }>();
 
-const nodeTypes = [
+interface NodeTypeOption {
+  type: string;
+  label: string;
+}
+
+const nodeTypes: NodeTypeOption[] = [
   { type: "start", label: "开始" },
   { type: "end", label: "结束" },
   { type: "task", label: "任务" },
@@ -158,24 +172,26 @@ const nodeTypes = [
   { type: "subprocess", label: "子流程" },
 ];
 
-const canvasHost = ref<HTMLElement | null>(null);
-const designerRoot = ref<HTMLElement | null>(null);
-const initialModel = isRenderableWorkflow(props.modelValue) ? props.modelValue : SAMPLE_WORKFLOW;
-const workflow = ref<WorkflowDefinition>(cloneWorkflow(initialModel));
+const canvasHost: Ref<HTMLElement | null> = ref(null);
+const designerRoot: Ref<HTMLElement | null> = ref(null);
+const initialModel: WorkflowDefinition = isRenderableWorkflow(props.modelValue)
+  ? props.modelValue
+  : SAMPLE_WORKFLOW;
+const workflow: Ref<WorkflowDefinition> = ref(cloneWorkflow(initialModel));
 const readonly: ComputedRef<boolean> = computed(() => props.readonly);
 const selection = ref<Selection>(null);
 const mode = ref<"design" | "json">("design");
-const jsonCode = ref("");
-const jsonError = ref("");
-const aboutOpen = ref(false);
-const validationOpen = ref(false);
+const jsonCode: Ref<string> = ref("");
+const jsonError: Ref<string> = ref("");
+const aboutOpen: Ref<boolean> = ref(false);
+const validationOpen: Ref<boolean> = ref(false);
 const validationIssues = ref<WorkflowValidationIssue[]>([]);
 let canvas: WorkflowCanvas | null = null;
 const undoStack = ref<WorkflowDefinition[]>([]);
 const redoStack = ref<WorkflowDefinition[]>([]);
-const cleanSnapshot = ref(JSON.stringify(workflow.value));
+const cleanSnapshot: Ref<string> = ref(JSON.stringify(workflow.value));
 let editBefore: WorkflowDefinition | null = null;
-const connectMode = ref(false);
+const connectMode: Ref<boolean> = ref(false);
 const connectFrom = ref<string | null>(null);
 const canUndo: ComputedRef<boolean> = computed(() => undoStack.value.length > 0);
 const canRedo: ComputedRef<boolean> = computed(() => redoStack.value.length > 0);
@@ -198,7 +214,7 @@ interface Clipboard {
 }
 const clipboard = ref<Clipboard | null>(null);
 let pasteCount: number = 0;
-const zoomPercentage = ref(100);
+const zoomPercentage: Ref<number> = ref(100);
 
 /** 更新画布当前选择。 */
 const select = (value: Selection): void => canvas?.select(value);
@@ -211,25 +227,33 @@ const fitToContent = (): void => canvas?.fitToContent();
 /** 恢复 100% 缩放和初始平移。 */
 const resetView = (): void => canvas?.resetView();
 /** 对齐当前多选节点。 */
-const alignSelection = (mode: "left" | "center" | "right" | "top" | "middle" | "bottom"): void => canvas?.alignSelection(mode);
+const alignSelection = (mode: "left" | "center" | "right" | "top" | "middle" | "bottom"): void =>
+  canvas?.alignSelection(mode);
 
 /** 对当前多选节点执行等间距分布。 */
-const distributeSelection = (axis: "horizontal" | "vertical"): void => canvas?.distributeSelection(axis);
+const distributeSelection = (axis: "horizontal" | "vertical"): void =>
+  canvas?.distributeSelection(axis);
 
 /** 接收画布选择，并在连线模式中处理起止节点。 */
 const onCanvasSelect = (value: Selection): void => {
   selection.value = value;
 
+
   if (readonly.value)
+
     return;
 
+
   if (!connectMode.value || value?.kind !== "node")
+
     return;
+
 
   if (!connectFrom.value) {
     connectFrom.value = value.ref;
     return;
   }
+
 
   if (connectFrom.value === value.ref) {
     window.alert("连线不能连接节点自身");
@@ -283,14 +307,20 @@ const addNode = (type: string): void => {
   if (readonly.value)
     return;
 
-  if (type === "start" && Object.values(workflow.value.states).some((node) => node.type === "start")) {
+
+  if (
+    type === "start" &&
+    Object.values(workflow.value.states).some((node) => node.type === "start")
+  ) {
     window.alert("流程只能包含一个开始节点");
     return;
   }
 
   let index: number = 1;
 
+
   while (workflow.value.states[`${type}${index}`])
+
     index++;
 
   const ref: string = `${type}${index}`;
@@ -302,7 +332,9 @@ const addNode = (type: string): void => {
     postInterceptors: { value: "" },
   };
 
-  if (type === "task") {
+
+  if (type === "task")
+
     Object.assign(props, {
       form: { value: "" },
       assignee: { value: "" },
@@ -314,12 +346,15 @@ const addNode = (type: string): void => {
       autoExecute: { value: "" },
       callback: { value: "" },
     });
-  }
+
 
   if (type === "decision")
+
     Object.assign(props, { expr: { value: "" }, handleClass: { value: "" } });
 
+
   if (type === "custom")
+
     Object.assign(props, {
       form: { value: "" },
       clazz: { value: "" },
@@ -330,6 +365,7 @@ const addNode = (type: string): void => {
 
 
   if (type === "subprocess")
+
     Object.assign(props, {
       form: { value: "" },
       processName: { value: "" },
@@ -369,11 +405,13 @@ const createPath = (from: string, to: string): void => {
     return;
   }
 
+
   if (workflow.value.states[to]?.type === "start") {
     window.alert("开始节点不能作为连线终点");
 
     return;
   }
+
 
   if (Object.values(workflow.value.paths).some((path) => path.from === from && path.to === to)) {
     window.alert("这两个节点之间已存在同方向连线");
@@ -381,12 +419,12 @@ const createPath = (from: string, to: string): void => {
     return;
   }
 
-  const before = cloneWorkflow(workflow.value);
-  let index = 1;
-  while (workflow.value.paths[`transition${index}`]) {
+  const before: WorkflowDefinition = cloneWorkflow(workflow.value);
+  let index: number = 1;
+
+  while (workflow.value.paths[`transition${index}`])
     index++;
-  }
-  const ref = `transition${index}`;
+  const ref: string = `transition${index}`;
   workflow.value.paths[ref] = {
     from,
     to,
@@ -404,19 +442,18 @@ const createPath = (from: string, to: string): void => {
 };
 /** 删除当前节点或连线选择。 */
 const deleteSelection = (): void => {
-  if (readonly.value || !selection.value) {
+  if (readonly.value || !selection.value)
     return;
-  }
   const before = cloneWorkflow(workflow.value);
-  if (selection.value.kind === "path") {
+
+  if (selection.value.kind === "path")
     delete workflow.value.paths[selection.value.ref];
-  } else {
+  else {
     const refs = selection.value.kind === "nodes" ? selection.value.refs : [selection.value.ref];
     refs.forEach((ref) => delete workflow.value.states[ref]);
     Object.entries(workflow.value.paths).forEach(([key, path]) => {
-      if (refs.includes(path.from) || refs.includes(path.to)) {
+      if (refs.includes(path.from) || refs.includes(path.to))
         delete workflow.value.paths[key];
-      }
     });
   }
   record(before);
@@ -425,23 +462,22 @@ const deleteSelection = (): void => {
 /** 将可复制的选中节点和内部连线写入组件剪贴板。 */
 const copySelection = (): void => {
   const refs = copyableNodeRefs.value;
-  if (!refs.length) {
+
+  if (!refs.length)
     return;
-  }
   const nodes: Clipboard["nodes"] = {},
     paths: Clipboard["paths"] = {};
   refs.forEach(
     (ref) =>
-    (nodes[ref] = cloneWorkflow({
-      states: { [ref]: workflow.value.states[ref] },
-      paths: {},
-      props: {},
-    }).states[ref]),
+      (nodes[ref] = cloneWorkflow({
+        states: { [ref]: workflow.value.states[ref] },
+        paths: {},
+        props: {},
+      }).states[ref]),
   );
   Object.entries(workflow.value.paths).forEach(([ref, path]) => {
-    if (refs.includes(path.from) && refs.includes(path.to)) {
+    if (refs.includes(path.from) && refs.includes(path.to))
       paths[ref] = JSON.parse(JSON.stringify(path));
-    }
   });
   clipboard.value = { nodes, paths };
   pasteCount = 0;
@@ -449,19 +485,18 @@ const copySelection = (): void => {
 
 /** 在指定映射中生成不重复的副本引用。 */
 const uniqueRef = (base: string, collection: Record<string, unknown>): string => {
-  let index = 1,
-    value = `${base}_copy`;
-  while (collection[value]) {
+  let index: number = 1;
+  let value: string = `${base}_copy`;
+
+  while (collection[value])
     value = `${base}_copy${++index}`;
-  }
   return value;
 };
 
 /** 粘贴组件剪贴板并对连续副本应用递增偏移。 */
 const pasteSelection = (): void => {
-  if (readonly.value || !clipboard.value) {
+  if (readonly.value || !clipboard.value)
     return;
-  }
   const before: WorkflowDefinition = cloneWorkflow(workflow.value),
     refs: string[] = Object.keys(clipboard.value.nodes),
     refMap: Record<string, string> = {},
@@ -549,6 +584,7 @@ const focusIssue = (issue: WorkflowValidationIssue): void => {
       ? "path"
       : null;
 
+
   if (kind) {
     validationOpen.value = false;
     mode.value = "design";
@@ -559,6 +595,7 @@ const focusIssue = (issue: WorkflowValidationIssue): void => {
 /** 校验流程并下载 JSON 文件。 */
 const downloadJson = (): void => {
   validationIssues.value = inspectWorkflow(workflow.value);
+
 
   if (validationIssues.value.length) {
     validationOpen.value = true;
@@ -580,14 +617,14 @@ const downloadJson = (): void => {
 
 /** 将变更前快照写入撤销栈并通知宿主。 */
 const record = (before: WorkflowDefinition): void => {
-  if (readonly.value || JSON.stringify(before) === JSON.stringify(workflow.value)) {
+  if (readonly.value || JSON.stringify(before) === JSON.stringify(workflow.value))
     return;
-  }
   undoStack.value.push(before);
 
-  if (undoStack.value.length > 100) {
+
+  if (undoStack.value.length > 100)
+
     undoStack.value.shift();
-  }
   redoStack.value = [];
   emitChange();
 };
@@ -597,18 +634,16 @@ const beginCanvasEdit = (): void => {
 };
 /** 在画布交互结束时提交一次历史记录。 */
 const endCanvasEdit = (): void => {
-  if (editBefore) {
+  if (editBefore)
     record(editBefore);
-  }
   editBefore = null;
   propertyBefore = cloneWorkflow(workflow.value);
 };
-let propertyBefore = cloneWorkflow(workflow.value);
+let propertyBefore: WorkflowDefinition = cloneWorkflow(workflow.value);
 /** 提交属性面板产生的模型变更。 */
 const commitPropertyChange = (): void => {
-  if (readonly.value) {
+  if (readonly.value)
     return;
-  }
   record(propertyBefore);
   propertyBefore = cloneWorkflow(workflow.value);
   refreshCanvas();
@@ -627,22 +662,22 @@ const replaceWorkflow = (
   undoStack.value = [];
   redoStack.value = [];
   propertyBefore = cloneWorkflow(value);
-  if (options.markClean) {
+
+  if (options.markClean)
     cleanSnapshot.value = JSON.stringify(value);
-  }
   mode.value = "design";
-  if (options.emit) {
+
+  if (options.emit)
     emitChange();
-  }
   nextTick(render);
   return true;
 };
 /** 撤销最近一次模型变更。 */
 const undo = (): void => {
-  const previous = undoStack.value.pop();
-  if (!previous) {
+  const previous: WorkflowDefinition | undefined = undoStack.value.pop();
+
+  if (!previous)
     return;
-  }
   redoStack.value.push(cloneWorkflow(workflow.value));
   workflow.value = previous;
   propertyBefore = cloneWorkflow(previous);
@@ -651,10 +686,10 @@ const undo = (): void => {
 };
 /** 重做最近一次被撤销的模型变更。 */
 const redo = (): void => {
-  const next = redoStack.value.pop();
-  if (!next) {
+  const next: WorkflowDefinition | undefined = redoStack.value.pop();
+
+  if (!next)
     return;
-  }
   undoStack.value.push(cloneWorkflow(workflow.value));
   workflow.value = next;
   propertyBefore = cloneWorkflow(next);
@@ -670,44 +705,56 @@ const handleResize = (): void => canvas?.resize();
 const activateDesigner = (): void => designerRoot.value?.focus({ preventScroll: true });
 /** 处理当前设计器实例的编辑快捷键。 */
 const handleKeydown = (event: KeyboardEvent): void => {
-  const target = event.target as HTMLElement;
-  if (["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName)) {
+  const target: HTMLElement = event.target as HTMLElement;
+
+  if (["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName))
     return;
-  }
+
   if (event.key === "Escape") {
     connectMode.value = false;
     connectFrom.value = null;
     canvas?.select(null);
   }
-  if (readonly.value) {
+
+  if (readonly.value)
     return;
-  }
-  if ((event.key === "Delete" || event.key === "Backspace") && selection.value) {
+
+  if ((event.key === "Delete" || event.key === "Backspace")
+    && selection.value) {
     event.preventDefault();
     deleteSelection();
   }
-  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "z") {
+
+  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase()
+    === "z") {
     event.preventDefault();
     event.shiftKey ? redo() : undo();
   }
-  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "y") {
+
+  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase()
+    === "y") {
     event.preventDefault();
     redo();
   }
-  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "c") {
+
+  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase()
+    === "c") {
     event.preventDefault();
     copySelection();
   }
-  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "v") {
+
+  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase()
+    === "v") {
     event.preventDefault();
     pasteSelection();
   }
+
   if (
     ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key) &&
     selectedNodeRefs.value.length
   ) {
     event.preventDefault();
-    const step = event.shiftKey ? 10 : 1;
+    const step: number = event.shiftKey ? 10 : 1;
     canvas?.moveSelection(
       event.key === "ArrowLeft" ? -step : event.key === "ArrowRight" ? step : 0,
       event.key === "ArrowUp" ? -step : event.key === "ArrowDown" ? step : 0,
@@ -723,12 +770,11 @@ const handleBeforeUnload = (event: BeforeUnloadEvent): void => {
 };
 
 onMounted(() => {
-  if (props.modelValue && !isRenderableWorkflow(props.modelValue)) {
+  if (props.modelValue && !isRenderableWorkflow(props.modelValue))
     emit("load-error", inspectWorkflow(props.modelValue));
-  }
-  if (!canvasHost.value) {
+
+  if (!canvasHost.value)
     return;
-  }
   canvas = new WorkflowCanvas(
     canvasHost.value,
     {
@@ -746,7 +792,7 @@ onMounted(() => {
 
 /** 向宿主发送完整模型副本。 */
 const emitChange = (): void => {
-  const value = cloneWorkflow(workflow.value);
+  const value: WorkflowDefinition = cloneWorkflow(workflow.value);
   emit("update:modelValue", value);
   emit("change", value);
 };
@@ -754,6 +800,7 @@ watch(
   () => props.readonly,
   (value) => {
     canvas?.setReadOnly(value);
+
     if (value) {
       connectMode.value = false;
       connectFrom.value = null;
@@ -763,9 +810,8 @@ watch(
 watch(
   () => props.modelValue,
   (value) => {
-    if (value && JSON.stringify(value) !== JSON.stringify(workflow.value)) {
+    if (value && JSON.stringify(value) !== JSON.stringify(workflow.value))
       replaceWorkflow(value, { markClean: true });
-    }
   },
   { deep: true },
 );
@@ -784,9 +830,9 @@ const markClean = (): void => {
 const getWorkflow = (): WorkflowDefinition => cloneWorkflow(workflow.value);
 /** 定位并选中指定引用的节点。 */
 const focusNode = (ref: string): boolean => {
-  if (!workflow.value.states[ref]) 
+  if (!workflow.value.states[ref])
     return false;
-  
+
   mode.value = "design";
   nextTick(() => canvas?.focus({ kind: "node", ref }));
   return true;

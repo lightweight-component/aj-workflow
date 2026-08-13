@@ -27,7 +27,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "check": "biome check src tests vite.config.ts vite.lib.config.ts",
-    "format": "biome check --write src tests vite.config.ts vite.lib.config.ts"
+    "format": "biome check --write --formatter-enabled=false src tests vite.config.ts vite.lib.config.ts"
   },
   "dependencies": {
     "raphael": "^2.3.0"

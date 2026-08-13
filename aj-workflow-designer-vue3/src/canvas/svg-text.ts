@@ -1,6 +1,6 @@
 import type { Box, Point } from "@/domain/workflow";
 
-const SVG_NS = "http://www.w3.org/2000/svg";
+const SVG_NS: string = "http://www.w3.org/2000/svg";
 
 /** 命令式 SVG 文本对象；它不属于 Vue 响应式状态。 */
 export class SvgText {
@@ -8,7 +8,7 @@ export class SvgText {
 
   /** 创建 SVG 文本元素并挂载到指定容器。 */
   constructor(container: SVGElement, text: string) {
-    this.element = document.createElementNS(SVG_NS, "text");
+    this.element = document.createElementNS(SVG_NS, "text") as SVGTextElement;
     this.element.classList.add("workflow-label");
     this.setText(text);
     container.appendChild(this.element);

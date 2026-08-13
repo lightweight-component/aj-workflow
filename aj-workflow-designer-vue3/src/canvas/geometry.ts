@@ -7,12 +7,15 @@ export function center(box: Box): Point {
 
 /** 返回矩形边界与“矩形中心到目标点”射线的交点。 */
 export function connectionPoint(box: Box, target: Point): Point {
-  const origin = center(box);
-  const dx = target.x - origin.x;
-  const dy = target.y - origin.y;
-  if (dx === 0 && dy === 0) {
+  const origin: Point = center(box);
+  const dx: number = target.x - origin.x;
+  const dy: number = target.y - origin.y;
+
+  if (dx === 0 && dy === 0)
     return origin;
-  }
-  const scale = 1 / Math.max(Math.abs(dx) / (box.width / 2), Math.abs(dy) / (box.height / 2));
+  const scale: number = 1 / Math.max(
+    Math.abs(dx) / (box.width / 2),
+    Math.abs(dy) / (box.height / 2),
+  );
   return { x: origin.x + dx * scale, y: origin.y + dy * scale };
 }

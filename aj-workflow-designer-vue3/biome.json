@@ -4,7 +4,7 @@
     "includes": ["src/**/*.{ts,vue}", "tests/**/*.ts", "vite*.ts"]
   },
   "formatter": {
-    "enabled": true,
+    "enabled": false,
     "indentStyle": "space",
     "indentWidth": 2,
     "lineWidth": 100
@@ -12,10 +12,7 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": false,
-      "style": {
-        "useBlockStatements": "error"
-      }
+      "recommended": false
     }
   }
 }

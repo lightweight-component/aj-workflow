@@ -175,13 +175,15 @@ const getProp = (name: string): string => node.value?.props[name]?.value ?? "";
 
 /** 更新当前节点的指定属性值。 */
 const setProp = (name: string, value: string): void => {
-  if (!node.value) 
+  if (!node.value)
     return;
-  
+
   node.value.props[name] ??= { value: "" };
   node.value.props[name].value = value;
 
-  if (name === "displayName" && node.value.text) 
+
+  if (name === "displayName" && node.value.text)
+
     node.value.text.text = value;
 
   changed();
@@ -219,9 +221,11 @@ const removeField = (index: number): void => {
 
 /** 将字段扩展属性转换为可编辑的多行文本。 */
 const attrsText = (attrs: Record<string, string>): string =>
-  Object.entries(attrs).map(([key, value]) => `${key}=${value}`).join("\n");
+  Object.entries(attrs)
+    .map(([key, value]) => `${key}=${value}`)
+    .join("\n");
 
-/** 
+/**
  * 解析多行文本并更新字段扩展属性。
  */
 const setAttrs = (index: number, text: string): void => {
@@ -229,10 +233,14 @@ const setAttrs = (index: number, text: string): void => {
     return;
 
   node.value.fields[index].attrs = Object.fromEntries(
-    text.split(/\r?\n/).filter(Boolean).map((line) => {
-      const at: number = line.indexOf("=");
-      return at < 0 ? [line.trim(), ""] : [line.slice(0, at).trim(), line.slice(at + 1)];
-    }).filter(([key]) => key)
+    text
+      .split(/\r?\n/)
+      .filter(Boolean)
+      .map((line) => {
+        const at: number = line.indexOf("=");
+        return at < 0 ? [line.trim(), ""] : [line.slice(0, at).trim(), line.slice(at + 1)];
+      })
+      .filter(([key]) => key),
   );
 
   changed();

@@ -81,9 +81,9 @@ export class WorkflowCanvas {
 
   /** 按当前业务模型刷新全部节点、标签和连线。 */
   refresh(): void {
-    if (!this.data) {
+    if (!this.data)
       return;
-    }
+
     for (const [ref, rendered] of this.nodes) {
       this.updateNodeShape(rendered.shape, rendered.data);
       rendered.label.setText(
@@ -91,9 +91,9 @@ export class WorkflowCanvas {
       );
       rendered.label.centerIn(rendered.data.attr);
     }
-    for (const ref of this.paths.keys()) {
+
+    for (const ref of this.paths.keys())
       this.updatePath(ref);
-    }
   }
 
   /** 注销事件并销毁 Raphael 资源。 */
@@ -133,9 +133,8 @@ export class WorkflowCanvas {
 
   /** 将当前节点选择按指定距离整体移动。 */
   moveSelection(dx: number, dy: number): void {
-    if (this.readOnly || !this.data || !this.selected || this.selected.kind === "path") {
+    if (this.readOnly || !this.data || !this.selected || this.selected.kind === "path")
       return;
-    }
     const refs = this.selected.kind === "nodes" ? this.selected.refs : [this.selected.ref];
     this.hooks.onEditStart?.();
     this.translateNodes(refs, dx, dy, true);
@@ -150,9 +149,8 @@ export class WorkflowCanvas {
       !this.data ||
       this.selected?.kind !== "nodes" ||
       this.selected.refs.length < 2
-    ) {
+    )
       return;
-    }
     const nodes = this.selected.refs.map((ref) => this.data!.states[ref]);
     const boxes = nodes.map((node) => node.attr),
       left = Math.min(...boxes.map((box) => box.x)),
@@ -161,24 +159,23 @@ export class WorkflowCanvas {
       bottom = Math.max(...boxes.map((box) => box.y + box.height));
     this.hooks.onEditStart?.();
     nodes.forEach((node) => {
-      if (mode === "left") {
+      if (mode === "left")
         node.attr.x = left;
-      }
-      if (mode === "center") {
+
+      if (mode === "center")
         node.attr.x = (left + right - node.attr.width) / 2;
-      }
-      if (mode === "right") {
+
+      if (mode === "right")
         node.attr.x = right - node.attr.width;
-      }
-      if (mode === "top") {
+
+      if (mode === "top")
         node.attr.y = top;
-      }
-      if (mode === "middle") {
+
+      if (mode === "middle")
         node.attr.y = (top + bottom - node.attr.height) / 2;
-      }
-      if (mode === "bottom") {
+
+      if (mode === "bottom")
         node.attr.y = bottom - node.attr.height;
-      }
     });
     this.refresh();
     this.select(this.selected);
@@ -192,9 +189,8 @@ export class WorkflowCanvas {
       !this.data ||
       this.selected?.kind !== "nodes" ||
       this.selected.refs.length < 3
-    ) {
+    )
       return;
-    }
     const entries = this.selected.refs
       .map((ref) => ({ ref, box: this.data!.states[ref].attr }))
       .sort((a, b) => (axis === "horizontal" ? a.box.x - b.box.x : a.box.y - b.box.y));
@@ -244,26 +240,28 @@ export class WorkflowCanvas {
 
   /** 将指定节点或连线移动到视图中心并选中。 */
   focus(selection: Selection): void {
-    if (!selection || !this.data) {
+    if (!selection || !this.data)
       return;
-    }
     let point: Point | null = null;
-    if (selection.kind === "node") {
+
+    if (selection.kind === "node")
       point = center(this.data.states[selection.ref].attr);
-    } else if (selection.kind === "nodes") {
+
+    else if (selection.kind === "nodes") {
       const boxes = selection.refs.map((ref) => this.data!.states[ref]?.attr).filter(Boolean);
-      if (boxes.length) {
+
+      if (boxes.length)
         point = {
           x: boxes.reduce((sum, box) => sum + center(box).x, 0) / boxes.length,
           y: boxes.reduce((sum, box) => sum + center(box).y, 0) / boxes.length,
         };
-      }
     } else {
       const path = this.data.paths[selection.ref];
-      if (path) {
+
+      if (path)
         point = polylineMidpoint(this.pathPoints(path));
-      }
     }
+
     if (point) {
       const size = this.viewSize();
       this.pan = { x: point.x - size.width / 2, y: point.y - size.height / 2 };
@@ -278,22 +276,24 @@ export class WorkflowCanvas {
     this.clearHandles();
     this.clearResizeHandles();
     this.selected = selection;
+
     if (selection?.kind === "node") {
       this.nodes.get(selection.ref)?.shape.attr({ stroke: "#2f7cf6", "stroke-width": 3 });
-      if (!this.readOnly) {
+
+      if (!this.readOnly)
         this.renderResizeHandles(selection.ref);
-      }
     }
-    if (selection?.kind === "nodes") {
+
+    if (selection?.kind === "nodes")
       selection.refs.forEach((ref) =>
         this.nodes.get(ref)?.shape.attr({ stroke: "#2f7cf6", "stroke-width": 3 }),
       );
-    }
+
     if (selection?.kind === "path") {
       this.paths.get(selection.ref)?.line.attr({ stroke: "#2f7cf6", "stroke-width": 3 });
-      if (!this.readOnly) {
+
+      if (!this.readOnly)
         this.renderHandles(selection.ref);
-      }
     }
     this.hooks.onSelect(selection);
   }
@@ -302,13 +302,13 @@ export class WorkflowCanvas {
   private drawNode(ref: string, node: WorkflowNode): void {
     const { x, y, width, height } = node.attr;
     let shape: RaphaelElementInstance;
-    if (["decision", "fork", "join"].includes(node.type)) {
+
+    if (["decision", "fork", "join"].includes(node.type))
       shape = this.paper.path(diamond({ x, y, width, height }));
-    } else if (["start", "end"].includes(node.type)) {
+
+    else if (["start", "end"].includes(node.type))
       shape = this.paper.ellipse(x + width / 2, y + height / 2, width / 2, height / 2);
-    } else {
-      shape = this.paper.rect(x, y, width, height, 8);
-    }
+    else shape = this.paper.rect(x, y, width, height, 8);
     shape.attr({
       fill: node.type === "end" ? "#fff1f0" : "#f5f8ff",
       stroke: "#356aa0",
@@ -327,15 +327,14 @@ export class WorkflowCanvas {
     let internalDots = new Map<string, Point[]>();
     shape.drag(
       (dx: number, dy: number) => {
-        if (this.readOnly) {
+        if (this.readOnly)
           return;
-        }
         dragRefs.forEach((nodeRef) => {
           const rendered = this.nodes.get(nodeRef),
             start = starts.get(nodeRef);
-          if (!rendered || !start) {
+
+          if (!rendered || !start)
             return;
-          }
           rendered.data.attr.x = start.x + dx / this.zoom;
           rendered.data.attr.y = start.y + dy / this.zoom;
           this.updateNodeShape(rendered.shape, rendered.data);
@@ -356,9 +355,8 @@ export class WorkflowCanvas {
         affectedPaths.forEach((pathRef) => this.updatePath(pathRef));
       },
       () => {
-        if (this.readOnly) {
+        if (this.readOnly)
           return;
-        }
         const selectedRefs =
           this.selected?.kind === "nodes"
             ? this.selected.refs
@@ -381,9 +379,8 @@ export class WorkflowCanvas {
         );
       },
       () => {
-        if (!this.readOnly) {
+        if (!this.readOnly)
           this.hooks.onEditEnd?.();
-        }
       },
     );
   }
@@ -399,9 +396,8 @@ export class WorkflowCanvas {
     });
     line.click(() => this.select({ kind: "path", ref }));
     line.dblclick((event: MouseEvent) => {
-      if (!this.readOnly) {
+      if (!this.readOnly)
         this.addWaypoint(ref, this.clientToCanvas(event.clientX, event.clientY));
-      }
     });
     const rendered: RenderedPath = { line, handles: [] };
     this.paths.set(ref, rendered);
@@ -412,25 +408,24 @@ export class WorkflowCanvas {
   /** 根据节点类型和尺寸更新对应 SVG 图形。 */
   private updateNodeShape(shape: RaphaelElementInstance, node: WorkflowNode): void {
     const box = node.attr;
-    if (["decision", "fork", "join"].includes(node.type)) {
+
+    if (["decision", "fork", "join"].includes(node.type))
       shape.attr({ path: diamond(box) });
-    } else if (["start", "end"].includes(node.type)) {
+
+    else if (["start", "end"].includes(node.type))
       shape.attr({
         cx: box.x + box.width / 2,
         cy: box.y + box.height / 2,
         rx: box.width / 2,
         ry: box.height / 2,
       });
-    } else {
-      shape.attr(box);
-    }
+    else shape.attr(box);
   }
 
   /** 计算连线端点及全部中间拐点。 */
   private pathPoints(path: WorkflowDefinition["paths"][string]): Point[] {
-    if (!this.data) {
+    if (!this.data)
       return [];
-    }
     const from = this.data.states[path.from].attr,
       to = this.data.states[path.to].attr;
     const firstTarget = path.dots[0] || center(to),
@@ -440,27 +435,29 @@ export class WorkflowCanvas {
 
   /** 按模型重新绘制指定连线及其文字。 */
   private updatePath(ref: string): void {
-    if (!this.data) {
+    if (!this.data)
       return;
-    }
     const path = this.data.paths[ref],
       rendered = this.paths.get(ref);
-    if (!path || !rendered || !this.data.states[path.from] || !this.data.states[path.to]) {
+
+    if (!path || !rendered || !this.data.states[path.from] || !this.data.states[path.to])
       return;
-    }
     const points = this.pathPoints(path);
     rendered.line.attr({
       path: points.map((point, i) => `${i ? "L" : "M"}${point.x} ${point.y}`).join(""),
     });
     const labelText = path.props.displayName?.value || path.text?.text || "";
+
     if (labelText && !rendered.label) {
       rendered.label = new SvgText(this.svg, labelText);
       rendered.label.element.style.pointerEvents = "none";
     }
+
     if (!labelText && rendered.label) {
       rendered.label.remove();
       rendered.label = undefined;
     }
+
     if (rendered.label) {
       rendered.label.setText(labelText);
       const middle = polylineMidpoint(points);
@@ -469,16 +466,15 @@ export class WorkflowCanvas {
         y: middle.y + (path.text?.y || -8),
       });
     }
-    if (this.selected?.kind === "path" && this.selected.ref === ref) {
+
+    if (this.selected?.kind === "path" && this.selected.ref === ref)
       this.positionHandles(ref);
-    }
   }
 
   /** 在距离点击位置最近的线段中插入拐点。 */
   private addWaypoint(ref: string, point: Point): void {
-    if (!this.data) {
+    if (!this.data)
       return;
-    }
     this.hooks.onEditStart?.();
     const path = this.data.paths[ref];
     const points = this.pathPoints(path);
@@ -501,11 +497,10 @@ export class WorkflowCanvas {
           ? [this.selected.ref]
           : [];
     const index = refs.indexOf(ref);
-    if (index >= 0) {
+
+    if (index >= 0)
       refs.splice(index, 1);
-    } else {
-      refs.push(ref);
-    }
+    else refs.push(ref);
     this.select(
       refs.length > 1
         ? { kind: "nodes", refs }
@@ -517,9 +512,8 @@ export class WorkflowCanvas {
 
   /** 为单个节点绘制四角尺寸调整柄。 */
   private renderResizeHandles(ref: string): void {
-    if (!this.data) {
+    if (!this.data)
       return;
-    }
     const node = this.data.states[ref],
       corners = ["nw", "ne", "sw", "se"] as const;
     corners.forEach((corner) => {
@@ -534,47 +528,49 @@ export class WorkflowCanvas {
             next = { ...start },
             minimum = 24,
             maximum = 2000;
-          if (corner.includes("e")) {
+
+          if (corner.includes("e"))
             next.width = Math.max(minimum, start.width + x);
-          }
-          if (corner.includes("s")) {
+
+          if (corner.includes("s"))
             next.height = Math.max(minimum, start.height + y);
-          }
+
           if (corner.includes("w")) {
             next.width = Math.max(minimum, start.width - x);
             next.x = start.x + start.width - next.width;
           }
+
           if (corner.includes("n")) {
             next.height = Math.max(minimum, start.height - y);
             next.y = start.y + start.height - next.height;
           }
           next.width = Math.min(maximum, next.width);
           next.height = Math.min(maximum, next.height);
+
           if (["start", "end"].includes(node.type)) {
             const size = Math.min(maximum, Math.max(minimum, Math.max(next.width, next.height)));
-            if (corner.includes("w")) {
+
+            if (corner.includes("w"))
               next.x = start.x + start.width - size;
-            }
-            if (corner.includes("n")) {
+
+            if (corner.includes("n"))
               next.y = start.y + start.height - size;
-            }
             next.width = size;
             next.height = size;
           } else if (["decision", "fork", "join"].includes(node.type)) {
             const ratio = start.width / start.height;
-            if (Math.abs(x) >= Math.abs(y)) {
+
+            if (Math.abs(x) >= Math.abs(y))
               next.height = next.width / ratio;
-            } else {
-              next.width = next.height * ratio;
-            }
+            else next.width = next.height * ratio;
             next.width = Math.min(maximum, Math.max(minimum, next.width));
             next.height = Math.min(maximum, Math.max(minimum, next.height));
-            if (corner.includes("w")) {
+
+            if (corner.includes("w"))
               next.x = start.x + start.width - next.width;
-            }
-            if (corner.includes("n")) {
+
+            if (corner.includes("n"))
               next.y = start.y + start.height - next.height;
-            }
           }
           Object.assign(node.attr, next);
           const rendered = this.nodes.get(ref)!;
@@ -596,9 +592,8 @@ export class WorkflowCanvas {
 
   /** 将尺寸调整柄移动到节点四角。 */
   private positionResizeHandles(ref: string): void {
-    if (!this.data) {
+    if (!this.data)
       return;
-    }
     const box = this.data.states[ref].attr;
     const points = [
       { x: box.x, y: box.y },
@@ -613,21 +608,19 @@ export class WorkflowCanvas {
 
   /** 移除全部节点尺寸调整柄。 */
   private clearResizeHandles(): void {
-    while (this.resizeHandles.length) {
+    while (this.resizeHandles.length)
       this.resizeHandles.pop().remove();
-    }
   }
 
   /** 为指定连线绘制可拖动拐点柄。 */
   private renderHandles(ref: string): void {
-    if (!this.data) {
+    if (!this.data)
       return;
-    }
     const rendered = this.paths.get(ref),
       path = this.data.paths[ref];
-    if (!rendered || !path) {
+
+    if (!rendered || !path)
       return;
-    }
     rendered.handles = path.dots.map((_point, index) => {
       const handle = this.paper.circle(0, 0, 6).attr({
         fill: "#fff",
@@ -664,9 +657,8 @@ export class WorkflowCanvas {
 
   /** 将拐点柄同步到模型坐标。 */
   private positionHandles(ref: string): void {
-    if (!this.data) {
+    if (!this.data)
       return;
-    }
     const rendered = this.paths.get(ref),
       path = this.data.paths[ref];
     rendered?.handles.forEach((handle, index) =>
@@ -688,27 +680,33 @@ export class WorkflowCanvas {
     dy: number,
     translateInternalDots: boolean,
   ): void {
-    if (!this.data) {
+    if (!this.data)
       return;
-    }
-    const refSet = new Set(refs);
+
+    const refSet: Set<string> = new Set(refs);
+
     refs.forEach((ref) => {
-      const node = this.data!.states[ref];
+      const node: WorkflowNode = this.data!.states[ref];
       node.attr.x += dx;
       node.attr.y += dy;
     });
-    if (translateInternalDots) {
+
+
+    if (translateInternalDots)
+
       Object.values(this.data.paths).forEach((path) => {
-        if (refSet.has(path.from) && refSet.has(path.to)) {
+        if (refSet.has(path.from)
+          && refSet.has(path.to)) {
           path.dots.forEach((point) => {
             point.x += dx;
             point.y += dy;
           });
         }
       });
-    }
+
     this.refresh();
   }
+
   /** 返回与指定节点相连的连线引用。 */
   private connectedPathRefs(nodeRef: string): string[] {
     return this.data
@@ -719,22 +717,23 @@ export class WorkflowCanvas {
   }
   /** 刷新与指定节点相连的全部连线。 */
   private updateConnectedPaths(nodeRef: string): void {
-    if (this.data) {
+    if (this.data)
       Object.entries(this.data.paths).forEach(([ref, path]) => {
         if (path.from === nodeRef || path.to === nodeRef) {
           this.updatePath(ref);
         }
       });
-    }
   }
+
   /** 清除节点和连线的选择高亮。 */
   private clearSelectionStyle(): void {
-    for (const node of this.nodes.values()) {
+    for (const node of this.nodes.values())
       node.shape.attr({ stroke: "#356aa0", "stroke-width": 2 });
-    }
-    for (const path of this.paths.values()) {
+
+
+    for (const path of this.paths.values())
+
       path.line.attr({ stroke: "#77808a", "stroke-width": 2 });
-    }
   }
   /** 返回当前缩放级别下的画布可视尺寸。 */
   private viewSize(): { width: number; height: number } {
@@ -779,9 +778,8 @@ export class WorkflowCanvas {
   };
   /** 在中键或 Alt+左键按下时开始平移画布。 */
   private onPanStart = (event: MouseEvent): void => {
-    if (event.button !== 1 && !(event.button === 0 && event.altKey)) {
+    if (event.button !== 1 && !(event.button === 0 && event.altKey))
       return;
-    }
     event.preventDefault();
     this.panning = true;
     this.panStart = {
@@ -793,9 +791,8 @@ export class WorkflowCanvas {
   };
   /** 按鼠标移动距离更新画布平移位置。 */
   private onPanMove = (event: MouseEvent): void => {
-    if (!this.panning) {
+    if (!this.panning)
       return;
-    }
     this.pan = {
       x: this.panStart.viewX - (event.clientX - this.panStart.x) / this.zoom,
       y: this.panStart.viewY - (event.clientY - this.panStart.y) / this.zoom,
@@ -808,9 +805,8 @@ export class WorkflowCanvas {
   };
   /** 在画布空白区域开始绘制框选矩形。 */
   private onMarqueeStart = (event: MouseEvent): void => {
-    if (this.readOnly || event.button !== 0 || event.altKey || event.target !== this.svg) {
+    if (this.readOnly || event.button !== 0 || event.altKey || event.target !== this.svg)
       return;
-    }
     event.preventDefault();
     this.marqueeStart = this.clientToCanvas(event.clientX, event.clientY);
     this.marquee = this.paper.rect(this.marqueeStart.x, this.marqueeStart.y, 0, 0).attr({
@@ -824,9 +820,8 @@ export class WorkflowCanvas {
   };
   /** 根据鼠标位置更新框选矩形。 */
   private onMarqueeMove = (event: MouseEvent): void => {
-    if (!this.marqueeStart || !this.marquee) {
+    if (!this.marqueeStart || !this.marquee)
       return;
-    }
     const point = this.clientToCanvas(event.clientX, event.clientY);
     this.marquee.attr({
       x: Math.min(this.marqueeStart.x, point.x),
@@ -838,9 +833,9 @@ export class WorkflowCanvas {
   /** 结束框选并选中完全位于矩形内的节点。 */
   private onMarqueeEnd = (): void => {
     window.removeEventListener("mousemove", this.onMarqueeMove);
-    if (!this.marqueeStart || !this.marquee || !this.data) {
+
+    if (!this.marqueeStart || !this.marquee || !this.data)
       return;
-    }
     const box = this.marquee.attr(),
       refs = Object.entries(this.data.states)
         .filter(
@@ -870,17 +865,17 @@ function diamond(box: Box): string {
 }
 /** 按折线实际长度计算中点。 */
 export function polylineMidpoint(points: Point[]): Point {
-  if (!points.length) {
+  if (!points.length)
     return { x: 0, y: 0 };
-  }
-  if (points.length === 1) {
+
+  if (points.length === 1)
     return points[0];
-  }
   const lengths = points
     .slice(1)
     .map((point, i) => Math.hypot(point.x - points[i].x, point.y - points[i].y));
   const half = lengths.reduce((sum, value) => sum + value, 0) / 2;
   let walked = 0;
+
   for (let i = 0; i < lengths.length; i++) {
     if (walked + lengths[i] >= half) {
       const ratio = lengths[i] ? (half - walked) / lengths[i] : 0;
@@ -897,8 +892,10 @@ export function polylineMidpoint(points: Point[]): Point {
 function nearestSegment(points: Point[], point: Point): number {
   let best: number = 0;
   let distance: number = Infinity;
+
   for (let i = 0; i < points.length - 1; i++) {
     const value = segmentDistance(point, points[i], points[i + 1]);
+
     if (value < distance) {
       distance = value;
       best = i;
