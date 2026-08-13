@@ -1,0 +1,49 @@
+.designer-shell, .designer-shell * { box-sizing: border-box; }
+.designer-shell button, .designer-shell input, .designer-shell select, .designer-shell textarea { font: inherit; }
+.designer-shell button { border: 1px solid #cbd4df; border-radius: 5px; background: white; padding: 7px 12px; cursor: pointer; }
+.designer-shell button:hover:not(:disabled), .designer-shell button.active { color: #1769d2; border-color: #73a8eb; background: #edf5ff; }
+.designer-shell button:disabled { cursor: not-allowed; opacity: .65; }
+.designer-shell { display: grid; grid-template-columns: 190px minmax(500px, 1fr) 280px; height: 100%; min-height: 560px; font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; color: #263342; }
+.toolbox, .property-editor { background: #f8fafc; padding: 18px; overflow: auto; }
+.toolbox { border-right: 1px solid #d8e0e8; }
+.toolbox h1 { margin: 0; font-size: 21px; }
+.toolbox h2, .property-editor h2 { font-size: 14px; margin: 28px 0 12px; color: #657486; }
+.muted, .empty-property { color: #8592a2; font-size: 13px; }
+.toolbox > button { display: flex; width: 100%; align-items: center; gap: 10px; margin-bottom: 8px; text-align: left; }
+.node-icon { width: 16px; height: 16px; border: 2px solid #356aa0; border-radius: 3px; }
+.node-icon.start, .node-icon.end { border-radius: 50%; }
+.node-icon.decision { transform: rotate(45deg) scale(.75); }
+.workspace { display: grid; grid-template-rows: 54px 40px minmax(0, 1fr); min-width: 0; }
+.toolbar { display: flex; align-items: center; gap: 20px; justify-content: space-between; padding: 8px 14px; background: white; border-bottom: 1px solid #d8e0e8; }
+.toolbar > div, .toolbar nav { display: flex; flex-wrap: wrap; gap: 7px; }
+.toolbar .about { margin-left: auto; }
+.dirty { color: #c26919; white-space: nowrap; font-size: 13px; }
+.view-tools { display: flex; align-items: center; gap: 6px; padding: 4px 12px; background: #f8fafc; border-bottom: 1px solid #d8e0e8; }
+.view-tools button { padding: 3px 9px; }
+.view-tools span { margin-left: auto; color: #7b8794; font-size: 12px; }
+.canvas { width: 100%; height: 100%; overflow: hidden; background-color: #fff; background-image: radial-gradient(#d5dbe2 1px, transparent 1px); background-size: 20px 20px; }
+.workflow-label { fill: #263342; font-size: 13px; user-select: none; }
+.property-editor { border-left: 1px solid #d8e0e8; }
+.property-editor label { display: grid; gap: 5px; margin-bottom: 13px; color: #536273; font-size: 13px; }
+.property-editor input, .property-editor select { width: 100%; border: 1px solid #ccd6e0; border-radius: 4px; padding: 7px 8px; background: white; }
+.property-editor input:disabled { background: #eef2f6; color: #7b8794; }
+.fields-editor { margin-top: 24px; }
+.fields-editor h2 { display: flex; align-items: center; justify-content: space-between; }
+.fields-editor h2 button { padding: 3px 8px; }
+.field-card { display: grid; gap: 6px; margin-bottom: 12px; padding: 10px; border: 1px solid #d8e0e8; border-radius: 6px; background: white; }
+.field-card textarea { min-height: 62px; resize: vertical; border: 1px solid #ccd6e0; border-radius: 4px; padding: 7px 8px; font-size: 12px; }
+.json-editor { display: grid; grid-template-rows: minmax(0, 1fr) auto; padding: 18px; background: #f5f7fa; }
+.json-editor textarea { resize: none; border: 1px solid #b9c5d2; border-radius: 6px; padding: 16px; font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
+.json-actions { display: flex; justify-content: flex-end; align-items: center; gap: 14px; padding-top: 10px; }
+.error { color: #c63030; }
+.validation-success { color: #268343; }
+.validation-list { max-height: 55vh; margin: 0; padding-left: 24px; overflow: auto; color: #9f2929; }
+.validation-list li { margin-bottom: 8px; }
+.validation-list button { border: 0; padding: 0; color: #9f2929; background: transparent; text-align: left; }
+.modal-mask { position: fixed; inset: 0; display: grid; place-items: center; background: rgb(20 30 40 / 45%); z-index: 1000; }
+.modal { width: min(520px, calc(100vw - 32px)); border-radius: 8px; background: white; box-shadow: 0 20px 60px rgb(0 0 0 / 25%); }
+.modal header, .modal footer { display: flex; align-items: center; padding: 14px 18px; border-bottom: 1px solid #e2e7ec; }
+.modal header button { margin-left: auto; border: 0; font-size: 20px; padding: 0 5px; }
+.modal-body { padding: 18px; line-height: 1.7; }
+.modal footer { justify-content: flex-end; border-top: 1px solid #e2e7ec; border-bottom: 0; }
+@media (max-width: 900px) { .designer-shell { grid-template-columns: 150px minmax(480px, 1fr); } .property-editor { display: none; } }
