@@ -391,11 +391,12 @@ function propertyString(props: Record<string, unknown>, key: string): string {
 function walk(initial: string[], next: (ref: string) => string[]): Set<string> {
   const visited = new Set<string>();
   const pending = [...initial];
+
   while (pending.length) {
     const ref = pending.pop()!;
-    if (visited.has(ref)) {
+    if (visited.has(ref)) 
       continue;
-    }
+    
     visited.add(ref);
     next(ref).forEach((item) => {
       if (!visited.has(item)) {
@@ -403,13 +404,14 @@ function walk(initial: string[], next: (ref: string) => string[]): Set<string> {
       }
     });
   }
+  
   return visited;
 }
 
 /** 校验流程，存在任何问题时抛出 WorkflowValidationError。 */
 export function validateWorkflow(value: unknown): asserts value is WorkflowDefinition {
-  const issues = inspectWorkflow(value);
-  if (issues.length) {
+  const issues: WorkflowValidationIssue[] = inspectWorkflow(value);
+
+  if (issues.length)
     throw new WorkflowValidationError(issues);
-  }
 }

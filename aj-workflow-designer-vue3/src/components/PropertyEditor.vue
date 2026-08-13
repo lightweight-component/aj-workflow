@@ -4,29 +4,15 @@
       <h2>节点属性</h2>
       <label>引用 <input :value="selectionRef" disabled /></label>
       <label>类型 <input :value="node.type" disabled /></label>
-      <label v-for="field in visibleFields" :key="field.name"
-        >{{ field.label }}
-        <select
-          v-if="field.options"
-          :disabled="readonly"
-          :value="getProp(field.name)"
-          @change="setProp(field.name, valueOf($event))"
-        >
-          <option
-            v-for="option in field.options"
-            :key="option.value"
-            :value="option.value"
-          >
+      <label v-for="field in visibleFields" :key="field.name">{{ field.label }}
+        <select v-if="field.options" :disabled="readonly" :value="getProp(field.name)"
+          @change="setProp(field.name, valueOf($event))">
+          <option v-for="option in field.options" :key="option.value" :value="option.value">
             {{ option.label }}
           </option>
         </select>
-        <input
-          v-else
-          :disabled="readonly"
-          :type="field.type || 'text'"
-          :value="getProp(field.name)"
-          @input="setProp(field.name, valueOf($event))"
-        />
+        <input v-else :disabled="readonly" :type="field.type || 'text'" :value="getProp(field.name)"
+          @input="setProp(field.name, valueOf($event))" />
       </label>
 
       <section v-if="node.type === 'task'" class="fields-editor">
@@ -36,40 +22,13 @@
             添加
           </button>
         </h2>
-        <div
-          v-for="(field, index) in node.fields"
-          :key="index"
-          class="field-card"
-        >
-          <input
-            v-model="field.name"
-            :disabled="readonly"
-            placeholder="字段名称"
-            @input="changed"
-          />
-          <input
-            v-model="field.displayName"
-            :disabled="readonly"
-            placeholder="显示名称"
-            @input="changed"
-          />
-          <input
-            v-model="field.type"
-            :disabled="readonly"
-            placeholder="Java 类型"
-            @input="changed"
-          />
-          <textarea
-            :disabled="readonly"
-            :value="attrsText(field.attrs)"
-            placeholder="扩展属性，每行 key=value"
-            @change="setAttrs(index, valueOf($event))"
-          />
-          <button
-            type="button"
-            :disabled="readonly"
-            @click="removeField(index)"
-          >
+        <div v-for="(field, index) in node.fields" :key="index" class="field-card">
+          <input v-model="field.name" :disabled="readonly" placeholder="字段名称" @input="changed" />
+          <input v-model="field.displayName" :disabled="readonly" placeholder="显示名称" @input="changed" />
+          <input v-model="field.type" :disabled="readonly" placeholder="Java 类型" @input="changed" />
+          <textarea :disabled="readonly" :value="attrsText(field.attrs)" placeholder="扩展属性，每行 key=value"
+            @change="setAttrs(index, valueOf($event))" />
+          <button type="button" :disabled="readonly" @click="removeField(index)">
             删除字段
           </button>
         </div>
@@ -80,13 +39,9 @@
       <label>引用 <input :value="selectionRef" disabled /></label>
       <label>起点 <input :value="path.from" disabled /></label>
       <label>终点 <input :value="path.to" disabled /></label>
-      <label v-for="field in transitionFields" :key="field.name"
-        >{{ field.label }}
-        <input
-          :disabled="readonly"
-          :value="getPathProp(field.name)"
-          @input="setPathProp(field.name, valueOf($event))"
-        />
+      <label v-for="field in transitionFields" :key="field.name">{{ field.label }}
+        <input :disabled="readonly" :value="getPathProp(field.name)"
+          @input="setPathProp(field.name, valueOf($event))" />
       </label>
     </template>
     <section v-else-if="selection?.kind === 'nodes'" class="empty-property">
@@ -95,14 +50,9 @@
     </section>
     <section v-else class="process-editor">
       <h2>流程属性</h2>
-      <label v-for="field in processFields" :key="field.name"
-        >{{ field.label }}
-        <input
-          v-model="workflow.props[field.name]"
-          :disabled="readonly"
-          :type="field.type || 'text'"
-          @input="changed"
-        />
+      <label v-for="field in processFields" :key="field.name">{{ field.label }}
+        <input v-model="workflow.props[field.name]" :disabled="readonly" :type="field.type || 'text'"
+          @input="changed" />
       </label>
     </section>
   </aside>
@@ -125,13 +75,17 @@ const props = defineProps<{
   selection: Selection;
   readonly?: boolean;
 }>();
+
 const emit = defineEmits<{ change: [] }>();
+
 const node: ComputedRef<WorkflowNode | null> = computed(() =>
   props.selection?.kind === "node" ? props.workflow.states[props.selection.ref] : null,
 );
+
 const path: ComputedRef<WorkflowTransition | null> = computed(() =>
   props.selection?.kind === "path" ? props.workflow.paths[props.selection.ref] : null,
 );
+
 const selectionRef: ComputedRef<string> = computed(() =>
   props.selection && "ref" in props.selection ? props.selection.ref : "",
 );
@@ -198,11 +152,13 @@ const visibleFields: ComputedRef<FormField[]> = computed(() => [
   ...commonFields,
   ...(byType[node.value?.type || ""] || []),
 ]);
+
 const transitionFields: FormField[] = [
   { name: "name", label: "名称" },
   { name: "displayName", label: "显示名称" },
   { name: "expr", label: "条件表达式" },
 ];
+
 const processFields: FormField[] = [
   { name: "name", label: "流程名称" },
   { name: "displayName", label: "显示名称" },
@@ -219,16 +175,14 @@ const getProp = (name: string): string => node.value?.props[name]?.value ?? "";
 
 /** 更新当前节点的指定属性值。 */
 const setProp = (name: string, value: string): void => {
-  if (!node.value) {
+  if (!node.value) 
     return;
-  }
-
+  
   node.value.props[name] ??= { value: "" };
   node.value.props[name].value = value;
 
-  if (name === "displayName" && node.value.text) {
+  if (name === "displayName" && node.value.text) 
     node.value.text.text = value;
-  }
 
   changed();
 };
@@ -265,25 +219,22 @@ const removeField = (index: number): void => {
 
 /** 将字段扩展属性转换为可编辑的多行文本。 */
 const attrsText = (attrs: Record<string, string>): string =>
-  Object.entries(attrs)
-    .map(([key, value]) => `${key}=${value}`)
-    .join("\n");
+  Object.entries(attrs).map(([key, value]) => `${key}=${value}`).join("\n");
 
-/** 解析多行文本并更新字段扩展属性。 */
+/** 
+ * 解析多行文本并更新字段扩展属性。
+ */
 const setAttrs = (index: number, text: string): void => {
-  if (!node.value?.fields) {
+  if (!node.value?.fields)
     return;
-  }
+
   node.value.fields[index].attrs = Object.fromEntries(
-    text
-      .split(/\r?\n/)
-      .filter(Boolean)
-      .map((line) => {
-        const at = line.indexOf("=");
-        return at < 0 ? [line.trim(), ""] : [line.slice(0, at).trim(), line.slice(at + 1)];
-      })
-      .filter(([key]) => key),
+    text.split(/\r?\n/).filter(Boolean).map((line) => {
+      const at: number = line.indexOf("=");
+      return at < 0 ? [line.trim(), ""] : [line.slice(0, at).trim(), line.slice(at + 1)];
+    }).filter(([key]) => key)
   );
+
   changed();
 };
 

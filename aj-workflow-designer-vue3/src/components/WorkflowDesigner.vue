@@ -1,31 +1,15 @@
 <template>
-  <main
-    ref="designerRoot"
-    class="designer-shell"
-    tabindex="0"
-    @keydown="handleKeydown"
-  >
+  <main ref="designerRoot" class="designer-shell" tabindex="0" @keydown="handleKeydown">
     <aside class="toolbox">
       <h1>Workflow</h1>
       <p class="muted">Vue 3 Designer</p>
-      <button
-        type="button"
-        :disabled="readonly"
-        :class="{ active: connectMode }"
-        @click="toggleConnect"
-      >
+      <button type="button" :disabled="readonly" :class="{ active: connectMode }" @click="toggleConnect">
         {{
           connectMode ? (connectFrom ? "请选择终点" : "请选择起点") : "创建连线"
         }}
       </button>
       <h2>组件</h2>
-      <button
-        v-for="item in nodeTypes"
-        :key="item.type"
-        type="button"
-        :disabled="readonly"
-        @click="addNode(item.type)"
-      >
+      <button v-for="item in nodeTypes" :key="item.type" type="button" :disabled="readonly" @click="addNode(item.type)">
         <span :class="['node-icon', item.type]" />{{ item.label }}
       </button>
     </aside>
@@ -47,80 +31,44 @@
           <button type="button" :disabled="readonly || !canRedo" @click="redo">
             重做
           </button>
-          <button
-            type="button"
-            :disabled="readonly || !selection"
-            @click="deleteSelection"
-          >
+          <button type="button" :disabled="readonly || !selection" @click="deleteSelection">
             删除
           </button>
-          <button
-            type="button"
-            :disabled="readonly || !copyableNodeRefs.length"
-            @click="copySelection"
-          >
+          <button type="button" :disabled="readonly || !copyableNodeRefs.length" @click="copySelection">
             复制
           </button>
-          <button
-            type="button"
-            :disabled="readonly || !clipboard"
-            @click="pasteSelection"
-          >
+          <button type="button" :disabled="readonly || !clipboard" @click="pasteSelection">
             粘贴
           </button>
           <template v-if="selectedNodeRefs.length > 1">
-            <button
-              type="button"
-              :disabled="readonly"
-              @click="alignSelection('left')"
-            >
+            <button type="button" :disabled="readonly" @click="alignSelection('left')">
               左对齐
             </button>
-            <button
-              type="button"
-              :disabled="readonly"
-              @click="alignSelection('top')"
-            >
+            <button type="button" :disabled="readonly" @click="alignSelection('top')">
               顶对齐
             </button>
-            <button
-              type="button"
-              :disabled="readonly || selectedNodeRefs.length < 3"
-              @click="distributeSelection('horizontal')"
-            >
+            <button type="button" :disabled="readonly || selectedNodeRefs.length < 3"
+              @click="distributeSelection('horizontal')">
               水平分布
             </button>
-            <button
-              type="button"
-              :disabled="readonly || selectedNodeRefs.length < 3"
-              @click="distributeSelection('vertical')"
-            >
+            <button type="button" :disabled="readonly || selectedNodeRefs.length < 3"
+              @click="distributeSelection('vertical')">
               垂直分布
             </button>
           </template>
         </div>
         <nav aria-label="编辑模式">
-          <button
-            type="button"
-            :class="{ active: mode === 'design' }"
-            @click="mode = 'design'"
-          >
+          <button type="button" :class="{ active: mode === 'design' }" @click="mode = 'design'">
             设计
           </button>
-          <button
-            type="button"
-            :class="{ active: mode === 'json' }"
-            @click="openJson"
-          >
+          <button type="button" :class="{ active: mode === 'json' }" @click="openJson">
             JSON
           </button>
         </nav>
         <button type="button" class="about" @click="aboutOpen = true">
           关于
         </button>
-        <span v-if="dirty" class="dirty" title="有尚未导出的修改"
-          >● 未保存</span
-        >
+        <span v-if="dirty" class="dirty" title="有尚未导出的修改">● 未保存</span>
       </header>
 
       <div class="view-tools">
@@ -130,65 +78,36 @@
           {{ zoomPercentage }}%
         </button>
         <button type="button" @click="fitToContent">适应窗口</button>
-        <span
-          >滚轮缩放，Alt+拖动或中键拖动画布；双击连线增加拐点，双击拐点删除</span
-        >
+        <span>滚轮缩放，Alt+拖动或中键拖动画布；双击连线增加拐点，双击拐点删除</span>
       </div>
 
-      <div
-        v-show="mode === 'design'"
-        ref="canvasHost"
-        class="canvas"
-        @pointerdown="activateDesigner"
-        @click.self="select(null)"
-      />
+      <div v-show="mode === 'design'" ref="canvasHost" class="canvas" @pointerdown="activateDesigner"
+        @click.self="select(null)" />
       <section v-if="mode === 'json'" class="json-editor">
-        <textarea
-          v-model="jsonCode"
-          :readonly="readonly"
-          spellcheck="false"
-          aria-label="流程 JSON"
-        />
+        <textarea v-model="jsonCode" :readonly="readonly" spellcheck="false" aria-label="流程 JSON" />
         <div class="json-actions">
-          <span v-if="jsonError" class="error">{{ jsonError }}</span
-          ><button type="button" :disabled="readonly" @click="applyJson">
+          <span v-if="jsonError" class="error">{{ jsonError }}</span><button type="button" :disabled="readonly"
+            @click="applyJson">
             应用 JSON
           </button>
         </div>
       </section>
     </section>
 
-    <PropertyEditor
-      :workflow="workflow"
-      :selection="selection"
-      :readonly="readonly"
-      @change="commitPropertyChange"
-    />
-    <SimpleModal
-      :open="aboutOpen"
-      title="关于 Aj Workflow Designer"
-      @close="aboutOpen = false"
-    >
+    <PropertyEditor :workflow="workflow" :selection="selection" :readonly="readonly" @change="commitPropertyChange" />
+    <SimpleModal :open="aboutOpen" title="关于 Aj Workflow Designer" @close="aboutOpen = false">
       <p>基于 Vue 3、TypeScript 与 Raphael 的轻量级流程设计器。</p>
       <p>SVG 图形采用命令式适配器管理，不进入 Vue 响应式系统。</p>
     </SimpleModal>
-    <SimpleModal
-      :open="validationOpen"
-      :title="
-        validationIssues.length
-          ? `发现 ${validationIssues.length} 个问题`
-          : '流程校验通过'
-      "
-      @close="validationOpen = false"
-    >
+    <SimpleModal :open="validationOpen" :title="validationIssues.length
+      ? `发现 ${validationIssues.length} 个问题`
+      : '流程校验通过'
+      " @close="validationOpen = false">
       <p v-if="!validationIssues.length" class="validation-success">
         流程结构和属性校验通过。
       </p>
       <ol v-else class="validation-list">
-        <li
-          v-for="(issue, index) in validationIssues"
-          :key="`${issue.code}-${index}`"
-        >
+        <li v-for="(issue, index) in validationIssues" :key="`${issue.code}-${index}`">
           <button type="button" @click="focusIssue(issue)">
             {{ issue.message }}
           </button>
@@ -278,7 +197,7 @@ interface Clipboard {
   paths: Record<string, WorkflowDefinition["paths"][string]>;
 }
 const clipboard = ref<Clipboard | null>(null);
-let pasteCount = 0;
+let pasteCount: number = 0;
 const zoomPercentage = ref(100);
 
 /** 更新画布当前选择。 */
@@ -292,51 +211,58 @@ const fitToContent = (): void => canvas?.fitToContent();
 /** 恢复 100% 缩放和初始平移。 */
 const resetView = (): void => canvas?.resetView();
 /** 对齐当前多选节点。 */
-const alignSelection = (mode: "left" | "center" | "right" | "top" | "middle" | "bottom"): void =>
-  canvas?.alignSelection(mode);
+const alignSelection = (mode: "left" | "center" | "right" | "top" | "middle" | "bottom"): void => canvas?.alignSelection(mode);
+
 /** 对当前多选节点执行等间距分布。 */
-const distributeSelection = (axis: "horizontal" | "vertical"): void =>
-  canvas?.distributeSelection(axis);
+const distributeSelection = (axis: "horizontal" | "vertical"): void => canvas?.distributeSelection(axis);
+
 /** 接收画布选择，并在连线模式中处理起止节点。 */
 const onCanvasSelect = (value: Selection): void => {
   selection.value = value;
-  if (readonly.value) {
+
+  if (readonly.value)
     return;
-  }
-  if (!connectMode.value || value?.kind !== "node") {
+
+  if (!connectMode.value || value?.kind !== "node")
     return;
-  }
+
   if (!connectFrom.value) {
     connectFrom.value = value.ref;
     return;
   }
+
   if (connectFrom.value === value.ref) {
     window.alert("连线不能连接节点自身");
     return;
   }
+
   createPath(connectFrom.value, value.ref);
   connectMode.value = false;
   connectFrom.value = null;
 };
+
 /** 使用当前模型重新绘制画布。 */
 const render = (): void => {
   canvas?.load(workflow.value);
   selection.value = null;
 };
+
 /** 原地刷新画布而不重建模型。 */
 const refreshCanvas = (): void => canvas?.refresh();
+
 /** 丢弃当前内容并恢复内置示例。 */
 const restoreSample = (): void => {
-  if (!confirmDiscard()) {
+  if (!confirmDiscard())
     return;
-  }
+
   replaceWorkflow(SAMPLE_WORKFLOW, { markClean: true, emit: true });
 };
+
 /** 创建一个空白流程。 */
 const newWorkflow = (): void => {
-  if (!confirmDiscard()) {
+  if (!confirmDiscard())
     return;
-  }
+
   replaceWorkflow(
     {
       states: {},
@@ -354,27 +280,28 @@ const newWorkflow = (): void => {
 };
 /** 按节点类型创建一个具有默认属性的新节点。 */
 const addNode = (type: string): void => {
-  if (readonly.value) {
+  if (readonly.value)
     return;
-  }
-  if (
-    type === "start" &&
-    Object.values(workflow.value.states).some((node) => node.type === "start")
-  ) {
+
+  if (type === "start" && Object.values(workflow.value.states).some((node) => node.type === "start")) {
     window.alert("流程只能包含一个开始节点");
     return;
   }
-  let index = 1;
-  while (workflow.value.states[`${type}${index}`]) {
+
+  let index: number = 1;
+
+  while (workflow.value.states[`${type}${index}`])
     index++;
-  }
-  const ref = `${type}${index}`;
+
+  const ref: string = `${type}${index}`;
+
   const props: Record<string, { value: string }> = {
     name: { value: ref },
     displayName: { value: ref },
     preInterceptors: { value: "" },
     postInterceptors: { value: "" },
   };
+
   if (type === "task") {
     Object.assign(props, {
       form: { value: "" },
@@ -388,10 +315,11 @@ const addNode = (type: string): void => {
       callback: { value: "" },
     });
   }
-  if (type === "decision") {
+
+  if (type === "decision")
     Object.assign(props, { expr: { value: "" }, handleClass: { value: "" } });
-  }
-  if (type === "custom") {
+
+  if (type === "custom")
     Object.assign(props, {
       form: { value: "" },
       clazz: { value: "" },
@@ -399,16 +327,18 @@ const addNode = (type: string): void => {
       args: { value: "" },
       var: { value: "" },
     });
-  }
-  if (type === "subprocess") {
+
+
+  if (type === "subprocess")
     Object.assign(props, {
       form: { value: "" },
       processName: { value: "" },
       version: { value: "0" },
     });
-  }
-  const count = Object.keys(workflow.value.states).length;
-  const before = cloneWorkflow(workflow.value);
+
+  const count: number = Object.keys(workflow.value.states).length;
+  const before: WorkflowDefinition = cloneWorkflow(workflow.value);
+
   workflow.value.states[ref] = {
     type,
     attr: {
@@ -420,29 +350,37 @@ const addNode = (type: string): void => {
     props,
     fields: type === "task" ? [] : undefined,
   };
+
   record(before);
   render();
   nextTick(() => canvas?.select({ kind: "node", ref }));
 };
+
 /** 切换选择起止节点的连线创建模式。 */
 const toggleConnect = (): void => {
   connectMode.value = !connectMode.value;
   connectFrom.value = null;
 };
+
 /** 创建一条从起点到终点的新连线。 */
 const createPath = (from: string, to: string): void => {
   if (workflow.value.states[from]?.type === "end") {
     window.alert("结束节点不能作为连线起点");
     return;
   }
+
   if (workflow.value.states[to]?.type === "start") {
     window.alert("开始节点不能作为连线终点");
+
     return;
   }
+
   if (Object.values(workflow.value.paths).some((path) => path.from === from && path.to === to)) {
     window.alert("这两个节点之间已存在同方向连线");
+
     return;
   }
+
   const before = cloneWorkflow(workflow.value);
   let index = 1;
   while (workflow.value.paths[`transition${index}`]) {
@@ -494,11 +432,11 @@ const copySelection = (): void => {
     paths: Clipboard["paths"] = {};
   refs.forEach(
     (ref) =>
-      (nodes[ref] = cloneWorkflow({
-        states: { [ref]: workflow.value.states[ref] },
-        paths: {},
-        props: {},
-      }).states[ref]),
+    (nodes[ref] = cloneWorkflow({
+      states: { [ref]: workflow.value.states[ref] },
+      paths: {},
+      props: {},
+    }).states[ref]),
   );
   Object.entries(workflow.value.paths).forEach(([ref, path]) => {
     if (refs.includes(path.from) && refs.includes(path.to)) {
@@ -846,9 +784,9 @@ const markClean = (): void => {
 const getWorkflow = (): WorkflowDefinition => cloneWorkflow(workflow.value);
 /** 定位并选中指定引用的节点。 */
 const focusNode = (ref: string): boolean => {
-  if (!workflow.value.states[ref]) {
+  if (!workflow.value.states[ref]) 
     return false;
-  }
+  
   mode.value = "design";
   nextTick(() => canvas?.focus({ kind: "node", ref }));
   return true;
@@ -856,6 +794,7 @@ const focusNode = (ref: string): boolean => {
 /** 返回当前选择的独立副本。 */
 const getSelection = (): Selection =>
   selection.value ? (JSON.parse(JSON.stringify(selection.value)) as Selection) : null;
+
 defineExpose({
   validate: () => inspectWorkflow(workflow.value),
   undo,
