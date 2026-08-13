@@ -9,16 +9,16 @@ declare const __VLS_export: import("vue").DefineComponent<__VLS_Props, {
     validate: () => WorkflowValidationIssue[];
     undo: () => void;
     redo: () => void;
-    zoomIn: () => void | undefined;
-    zoomOut: () => void | undefined;
-    resetView: () => void | undefined;
-    fitToContent: () => void | undefined;
+    zoomIn: () => void;
+    zoomOut: () => void;
+    resetView: () => void;
+    fitToContent: () => void;
     markClean: () => void;
     focusNode: (ref: string) => boolean;
     getSelection: () => Selection;
     getWorkflow: () => WorkflowDefinition;
-    alignSelection: (mode: "left" | "center" | "right" | "top" | "middle" | "bottom") => void | undefined;
-    distributeSelection: (axis: "horizontal" | "vertical") => void | undefined;
+    alignSelection: (mode: "left" | "center" | "right" | "top" | "middle" | "bottom") => void;
+    distributeSelection: (axis: "horizontal" | "vertical") => void;
 }, {}, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {
     change: (value: WorkflowDefinition) => any;
     "update:modelValue": (value: WorkflowDefinition) => any;

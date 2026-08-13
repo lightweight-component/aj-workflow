@@ -1,5 +1,5 @@
-import type { WorkflowDefinition } from "@/domain/workflow";
 import type { Selection } from "@/canvas/workflow-canvas";
+import type { WorkflowDefinition } from "@/domain/workflow";
 type __VLS_Props = {
     workflow: WorkflowDefinition;
     selection: Selection;

@@ -1,18 +1,24 @@
 import WorkflowDesigner from "./components/WorkflowDesigner.vue";
 import "./styles/main.less";
 
-export { WorkflowDesigner };
-export { cloneWorkflow, inspectWorkflow, isRenderableWorkflow, validateWorkflow, WorkflowValidationError } from "./domain/workflow";
 export type {
   Box,
   Point,
   WorkflowDefinition,
   WorkflowField,
   WorkflowNode,
-  WorkflowProperty,
   WorkflowProperties,
+  WorkflowProperty,
   WorkflowTransition,
-  WorkflowValidationIssue
+  WorkflowValidationIssue,
 } from "./domain/workflow";
+export {
+  cloneWorkflow,
+  inspectWorkflow,
+  isRenderableWorkflow,
+  validateWorkflow,
+  WorkflowValidationError,
+} from "./domain/workflow";
+export { WorkflowDesigner };
 
 export default WorkflowDesigner;

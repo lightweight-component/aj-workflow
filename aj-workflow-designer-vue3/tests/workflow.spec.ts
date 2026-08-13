@@ -1,8 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { cloneWorkflow, inspectWorkflow, isRenderableWorkflow, validateWorkflow } from "@/domain/workflow";
-import { SAMPLE_WORKFLOW } from "@/domain/sample-workflow";
 import { connectionPoint } from "@/canvas/geometry";
 import { polylineMidpoint } from "@/canvas/workflow-canvas";
+import { SAMPLE_WORKFLOW } from "@/domain/sample-workflow";
+import {
+  cloneWorkflow,
+  inspectWorkflow,
+  isRenderableWorkflow,
+  validateWorkflow,
+} from "@/domain/workflow";
 
 describe("workflow domain", () => {
   it("deep clones workflow definitions", () => {
@@ -18,7 +23,10 @@ describe("workflow domain", () => {
   });
 
   it("finds the rectangle boundary intersection", () => {
-    expect(connectionPoint({ x: 0, y: 0, width: 100, height: 50 }, { x: 200, y: 25 })).toEqual({ x: 100, y: 25 });
+    expect(connectionPoint({ x: 0, y: 0, width: 100, height: 50 }, { x: 200, y: 25 })).toEqual({
+      x: 100,
+      y: 25,
+    });
   });
 
   it("rejects an unsupported node type", () => {
@@ -36,7 +44,7 @@ describe("workflow domain", () => {
     const invalid = cloneWorkflow(SAMPLE_WORKFLOW);
     delete invalid.paths.transition1;
     invalid.paths.transition3.from = "end1";
-    const codes = inspectWorkflow(invalid).map(issue => issue.code);
+    const codes = inspectWorkflow(invalid).map((issue) => issue.code);
     expect(codes).toContain("NODE_WITHOUT_OUTPUT");
     expect(codes).toContain("NODE_WITHOUT_INPUT");
     expect(codes).toContain("END_HAS_OUTPUT");
@@ -47,10 +55,26 @@ describe("workflow domain", () => {
   it("checks fork, join, decision and type-specific properties", () => {
     const invalid = cloneWorkflow(SAMPLE_WORKFLOW);
     invalid.states.decision1.props.expr.value = "";
-    invalid.states.custom1 = { type: "custom", attr: { x: 1, y: 1, width: 100, height: 50 }, props: { name: { value: "custom1" }, displayName: { value: "custom" }, clazz: { value: "" } } };
-    invalid.states.fork1 = { type: "fork", attr: { x: 1, y: 1, width: 50, height: 50 }, props: { name: { value: "fork1" }, displayName: { value: "fork" } } };
-    invalid.states.join1 = { type: "join", attr: { x: 1, y: 1, width: 50, height: 50 }, props: { name: { value: "join1" }, displayName: { value: "join" } } };
-    const codes = inspectWorkflow(invalid).map(issue => issue.code);
+    invalid.states.custom1 = {
+      type: "custom",
+      attr: { x: 1, y: 1, width: 100, height: 50 },
+      props: {
+        name: { value: "custom1" },
+        displayName: { value: "custom" },
+        clazz: { value: "" },
+      },
+    };
+    invalid.states.fork1 = {
+      type: "fork",
+      attr: { x: 1, y: 1, width: 50, height: 50 },
+      props: { name: { value: "fork1" }, displayName: { value: "fork" } },
+    };
+    invalid.states.join1 = {
+      type: "join",
+      attr: { x: 1, y: 1, width: 50, height: 50 },
+      props: { name: { value: "join1" }, displayName: { value: "join" } },
+    };
+    const codes = inspectWorkflow(invalid).map((issue) => issue.code);
     expect(codes).toContain("DECISION_RULE_REQUIRED");
     expect(codes).toContain("CUSTOM_CLASS_REQUIRED");
     expect(codes).toContain("FORK_OUTPUTS");
@@ -64,9 +88,9 @@ describe("workflow domain", () => {
     invalid.states.apply.props.reminderRepeat = { value: "-1" };
     invalid.states.apply.fields = [
       { name: "amount", displayName: "金额", type: "", attrs: {} },
-      { name: "amount", displayName: "重复", type: "Long", attrs: {} }
+      { name: "amount", displayName: "重复", type: "Long", attrs: {} },
     ];
-    const codes = inspectWorkflow(invalid).map(issue => issue.code);
+    const codes = inspectWorkflow(invalid).map((issue) => issue.code);
     expect(codes).toContain("DUPLICATE_NODE_NAME");
     expect(codes).toContain("INVALID_PERFORM_TYPE");
     expect(codes).toContain("INVALID_REMINDER_REPEAT");
@@ -76,22 +100,39 @@ describe("workflow domain", () => {
 
   it("never throws for malformed nested JSON", () => {
     const malformed = {
-      states: { start: { type: "start", attr: null, props: null }, task: { type: "task", attr: { x: 0, y: 0, width: 10, height: 10 }, props: {}, fields: [null] } },
-      paths: { bad: { from: "start", to: "task", dots: [null], props: null } }, props: { name: "bad" }
+      states: {
+        start: { type: "start", attr: null, props: null },
+        task: {
+          type: "task",
+          attr: { x: 0, y: 0, width: 10, height: 10 },
+          props: {},
+          fields: [null],
+        },
+      },
+      paths: { bad: { from: "start", to: "task", dots: [null], props: null } },
+      props: { name: "bad" },
     };
     expect(() => inspectWorkflow(malformed)).not.toThrow();
-    const codes = inspectWorkflow(malformed).map(issue => issue.code);
+    const codes = inspectWorkflow(malformed).map((issue) => issue.code);
     expect(codes).toContain("INVALID_NODE_BOX");
     expect(codes).toContain("INVALID_FIELD");
     expect(codes).toContain("INVALID_PATH_POINTS");
   });
 
   it("rejects arrays where maps are required", () => {
-    expect(inspectWorkflow({ states: [], paths: [], props: [] }).map(issue => issue.code)).toEqual(["MISSING_STATES", "MISSING_PATHS", "MISSING_PROPS"]);
+    expect(
+      inspectWorkflow({ states: [], paths: [], props: [] }).map((issue) => issue.code),
+    ).toEqual(["MISSING_STATES", "MISSING_PATHS", "MISSING_PROPS"]);
   });
 
   it("calculates a polyline midpoint by traveled length", () => {
-    expect(polylineMidpoint([{ x: 0, y: 0 }, { x: 8, y: 0 }, { x: 8, y: 4 }])).toEqual({ x: 6, y: 0 });
+    expect(
+      polylineMidpoint([
+        { x: 0, y: 0 },
+        { x: 8, y: 0 },
+        { x: 8, y: 4 },
+      ]),
+    ).toEqual({ x: 6, y: 0 });
   });
 
   it("clones selected model data without sharing nested values", () => {
@@ -105,6 +146,12 @@ describe("workflow domain", () => {
     delete incomplete.paths.transition1;
     expect(isRenderableWorkflow(incomplete)).toBe(true);
     expect(inspectWorkflow(incomplete).length).toBeGreaterThan(0);
-    expect(isRenderableWorkflow({ states: { bad: { type: "task" } }, paths: {}, props: {} })).toBe(false);
+    expect(
+      isRenderableWorkflow({
+        states: { bad: { type: "task" } },
+        paths: {},
+        props: {},
+      }),
+    ).toBe(false);
   });
 });

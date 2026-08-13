@@ -6,6 +6,7 @@ const SVG_NS = "http://www.w3.org/2000/svg";
 export class SvgText {
   readonly element: SVGTextElement;
 
+  /** 创建 SVG 文本元素并挂载到指定容器。 */
   constructor(container: SVGElement, text: string) {
     this.element = document.createElementNS(SVG_NS, "text");
     this.element.classList.add("workflow-label");
@@ -13,18 +14,26 @@ export class SvgText {
     container.appendChild(this.element);
   }
 
-  setText(value: string): void { this.element.textContent = value; }
+  /** 更新文本内容。 */
+  setText(value: string): void {
+    this.element.textContent = value;
+  }
 
+  /** 将文本移动到指定画布坐标。 */
   setPosition(point: Point): void {
     this.element.setAttribute("x", String(point.x));
     this.element.setAttribute("y", String(point.y));
   }
 
+  /** 将文本居中放置在指定矩形中。 */
   centerIn(box: Box): void {
     this.element.setAttribute("text-anchor", "middle");
     this.element.setAttribute("dominant-baseline", "middle");
     this.setPosition({ x: box.x + box.width / 2, y: box.y + box.height / 2 });
   }
 
-  remove(): void { this.element.remove(); }
+  /** 从 SVG 文档中移除文本元素。 */
+  remove(): void {
+    this.element.remove();
+  }
 }
