@@ -271,7 +271,6 @@ export function inspectWorkflow(value: unknown): WorkflowValidationIssue[] {
     }
   }
 
-
   for (const [ref, path] of Object.entries(paths)) {
     if (!isRecord(path)) {
       add("INVALID_PATH", `连线 ${ref} 无效`, ref);
@@ -315,7 +314,6 @@ export function inspectWorkflow(value: unknown): WorkflowValidationIssue[] {
       add("INVALID_PATH_POINTS", `连线 ${ref} 的拐点坐标无效`, ref);
   }
 
-
   if (starts.length !== 1)
 
     add("START_COUNT", "流程必须且只能包含一个开始节点", "process");
@@ -326,6 +324,7 @@ export function inspectWorkflow(value: unknown): WorkflowValidationIssue[] {
   for (const [ref, rawNode] of Object.entries(states)) {
     if (!isRecord(rawNode))
       continue;
+
     const node = rawNode as unknown as WorkflowNode;
     const inputCount = incoming.get(ref)?.length || 0;
     const outputCount = outgoing.get(ref)?.length || 0;
@@ -375,13 +374,12 @@ export function inspectWorkflow(value: unknown): WorkflowValidationIssue[] {
   }
 
   if (ends.length) {
-    const reachesEnd = walk(ends, (ref) =>
-      (incoming.get(ref) || []).map((pathRef) => (paths[pathRef] as WorkflowTransition).from),
-    );
+    const reachesEnd = walk(ends, (ref) => (incoming.get(ref) || []).map((pathRef) => (paths[pathRef] as WorkflowTransition).from));
     Object.keys(states)
       .filter((ref) => !reachesEnd.has(ref))
       .forEach((ref) => add("NO_PATH_TO_END", `节点 ${ref} 无法到达结束节点`, ref));
   }
+
   return issues;
 }
 
@@ -392,6 +390,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 /** 安全读取属性映射中的字符串值。 */
 function propertyString(props: Record<string, unknown>, key: string): string {
   const item = props[key];
+
   return isRecord(item) && typeof item.value === "string" ? item.value.trim() : "";
 }
 
@@ -399,7 +398,6 @@ function propertyString(props: Record<string, unknown>, key: string): string {
 function walk(initial: string[], next: (ref: string) => string[]): Set<string> {
   const visited = new Set<string>();
   const pending = [...initial];
-
 
   while (pending.length) {
     const ref = pending.pop()!;
@@ -421,8 +419,6 @@ function walk(initial: string[], next: (ref: string) => string[]): Set<string> {
 export function validateWorkflow(value: unknown): asserts value is WorkflowDefinition {
   const issues: WorkflowValidationIssue[] = inspectWorkflow(value);
 
-
   if (issues.length)
-
     throw new WorkflowValidationError(issues);
 }

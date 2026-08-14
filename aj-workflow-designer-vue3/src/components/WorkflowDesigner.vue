@@ -465,20 +465,22 @@ const copySelection = (): void => {
 
   if (!refs.length)
     return;
-  const nodes: Clipboard["nodes"] = {},
-    paths: Clipboard["paths"] = {};
+
+  const nodes: Clipboard["nodes"] = {}, paths: Clipboard["paths"] = {};
   refs.forEach(
     (ref) =>
-      (nodes[ref] = cloneWorkflow({
-        states: { [ref]: workflow.value.states[ref] },
-        paths: {},
-        props: {},
-      }).states[ref]),
+    (nodes[ref] = cloneWorkflow({
+      states: { [ref]: workflow.value.states[ref] },
+      paths: {},
+      props: {},
+    }).states[ref]),
   );
+
   Object.entries(workflow.value.paths).forEach(([ref, path]) => {
     if (refs.includes(path.from) && refs.includes(path.to))
       paths[ref] = JSON.parse(JSON.stringify(path));
   });
+
   clipboard.value = { nodes, paths };
   pasteCount = 0;
 };
@@ -490,6 +492,7 @@ const uniqueRef = (base: string, collection: Record<string, unknown>): string =>
 
   while (collection[value])
     value = `${base}_copy${++index}`;
+
   return value;
 };
 
@@ -497,16 +500,17 @@ const uniqueRef = (base: string, collection: Record<string, unknown>): string =>
 const pasteSelection = (): void => {
   if (readonly.value || !clipboard.value)
     return;
+
   const before: WorkflowDefinition = cloneWorkflow(workflow.value),
     refs: string[] = Object.keys(clipboard.value.nodes),
     refMap: Record<string, string> = {},
     pasted: string[] = [],
     offset = 30 * ++pasteCount;
+
   refs.forEach((ref) => {
-    const node: WorkflowDefinition["states"][string] = JSON.parse(
-      JSON.stringify(clipboard.value!.nodes[ref]),
-    ) as WorkflowDefinition["states"][string];
+    const node: WorkflowDefinition["states"][string] = JSON.parse(JSON.stringify(clipboard.value!.nodes[ref])) as WorkflowDefinition["states"][string];
     const nextRef: string = uniqueRef(ref, workflow.value.states);
+
     refMap[ref] = nextRef;
     pasted.push(nextRef);
     node.attr.x += offset;
@@ -517,15 +521,15 @@ const pasteSelection = (): void => {
 
   Object.entries(clipboard.value.paths).forEach(([ref, source]) => {
     const nextRef: string = uniqueRef(ref, workflow.value.paths);
-    const path: WorkflowDefinition["paths"][string] = JSON.parse(
-      JSON.stringify(source),
-    ) as WorkflowDefinition["paths"][string];
+    const path: WorkflowDefinition["paths"][string] = JSON.parse(JSON.stringify(source)) as WorkflowDefinition["paths"][string];
+
     path.from = refMap[path.from];
     path.to = refMap[path.to];
     path.dots = path.dots.map((point: { x: number; y: number }) => ({
       x: point.x + offset,
       y: point.y + offset,
     }));
+
     path.props.name = { value: nextRef };
     workflow.value.paths[nextRef] = path;
   });
@@ -596,16 +600,13 @@ const focusIssue = (issue: WorkflowValidationIssue): void => {
 const downloadJson = (): void => {
   validationIssues.value = inspectWorkflow(workflow.value);
 
-
   if (validationIssues.value.length) {
     validationOpen.value = true;
     return;
   }
 
   const url: string = URL.createObjectURL(
-    new Blob([JSON.stringify(workflow.value, null, 2)], {
-      type: "application/json",
-    }),
+    new Blob([JSON.stringify(workflow.value, null, 2)], { type: "application/json" }),
   );
   const link: HTMLAnchorElement = document.createElement("a");
 
@@ -619,12 +620,12 @@ const downloadJson = (): void => {
 const record = (before: WorkflowDefinition): void => {
   if (readonly.value || JSON.stringify(before) === JSON.stringify(workflow.value))
     return;
+
   undoStack.value.push(before);
 
-
   if (undoStack.value.length > 100)
-
     undoStack.value.shift();
+
   redoStack.value = [];
   emitChange();
 };
@@ -636,14 +637,17 @@ const beginCanvasEdit = (): void => {
 const endCanvasEdit = (): void => {
   if (editBefore)
     record(editBefore);
+
   editBefore = null;
   propertyBefore = cloneWorkflow(workflow.value);
 };
 let propertyBefore: WorkflowDefinition = cloneWorkflow(workflow.value);
+
 /** 提交属性面板产生的模型变更。 */
 const commitPropertyChange = (): void => {
   if (readonly.value)
     return;
+
   record(propertyBefore);
   propertyBefore = cloneWorkflow(workflow.value);
   refreshCanvas();
@@ -665,10 +669,12 @@ const replaceWorkflow = (
 
   if (options.markClean)
     cleanSnapshot.value = JSON.stringify(value);
+
   mode.value = "design";
 
   if (options.emit)
     emitChange();
+
   nextTick(render);
   return true;
 };
@@ -678,6 +684,7 @@ const undo = (): void => {
 
   if (!previous)
     return;
+
   redoStack.value.push(cloneWorkflow(workflow.value));
   workflow.value = previous;
   propertyBefore = cloneWorkflow(previous);
@@ -690,6 +697,7 @@ const redo = (): void => {
 
   if (!next)
     return;
+
   undoStack.value.push(cloneWorkflow(workflow.value));
   workflow.value = next;
   propertyBefore = cloneWorkflow(next);
@@ -697,12 +705,14 @@ const redo = (): void => {
   nextTick(render);
 };
 /** 在覆盖当前模型前确认是否丢弃未保存变更。 */
-const confirmDiscard = (): boolean =>
-  !dirty.value || window.confirm("当前流程有未保存修改，确定放弃吗？");
+const confirmDiscard = (): boolean => !dirty.value || window.confirm("当前流程有未保存修改，确定放弃吗？");
+
 /** 将浏览器窗口尺寸变化同步到画布。 */
 const handleResize = (): void => canvas?.resize();
+
 /** 激活当前设计器实例的键盘快捷键作用域。 */
 const activateDesigner = (): void => designerRoot.value?.focus({ preventScroll: true });
+
 /** 处理当前设计器实例的编辑快捷键。 */
 const handleKeydown = (event: KeyboardEvent): void => {
   const target: HTMLElement = event.target as HTMLElement;
@@ -719,32 +729,27 @@ const handleKeydown = (event: KeyboardEvent): void => {
   if (readonly.value)
     return;
 
-  if ((event.key === "Delete" || event.key === "Backspace")
-    && selection.value) {
+  if ((event.key === "Delete" || event.key === "Backspace") && selection.value) {
     event.preventDefault();
     deleteSelection();
   }
 
-  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase()
-    === "z") {
+  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "z") {
     event.preventDefault();
     event.shiftKey ? redo() : undo();
   }
 
-  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase()
-    === "y") {
+  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "y") {
     event.preventDefault();
     redo();
   }
 
-  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase()
-    === "c") {
+  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "c") {
     event.preventDefault();
     copySelection();
   }
 
-  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase()
-    === "v") {
+  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "v") {
     event.preventDefault();
     pasteSelection();
   }
@@ -761,6 +766,7 @@ const handleKeydown = (event: KeyboardEvent): void => {
     );
   }
 };
+
 /** 按配置在脏状态下阻止页面直接离开。 */
 const handleBeforeUnload = (event: BeforeUnloadEvent): void => {
   if (props.guardBeforeUnload && dirty.value) {
@@ -807,6 +813,7 @@ watch(
     }
   },
 );
+
 watch(
   () => props.modelValue,
   (value) => {
@@ -815,6 +822,7 @@ watch(
   },
   { deep: true },
 );
+
 watch(dirty, (value) => emit("dirty-change", value), { immediate: true });
 onBeforeUnmount(() => {
   window.removeEventListener("resize", handleResize);
@@ -826,8 +834,10 @@ onBeforeUnmount(() => {
 const markClean = (): void => {
   cleanSnapshot.value = JSON.stringify(workflow.value);
 };
+
 /** 返回当前流程模型的独立副本。 */
 const getWorkflow = (): WorkflowDefinition => cloneWorkflow(workflow.value);
+
 /** 定位并选中指定引用的节点。 */
 const focusNode = (ref: string): boolean => {
   if (!workflow.value.states[ref])
@@ -837,6 +847,7 @@ const focusNode = (ref: string): boolean => {
   nextTick(() => canvas?.focus({ kind: "node", ref }));
   return true;
 };
+
 /** 返回当前选择的独立副本。 */
 const getSelection = (): Selection =>
   selection.value ? (JSON.parse(JSON.stringify(selection.value)) as Selection) : null;
